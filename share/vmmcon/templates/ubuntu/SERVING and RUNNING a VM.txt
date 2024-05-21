@@ -1,0 +1,24 @@
+# run a web server
+$ python3 -m http.server 3003
+
+# create an image to get used as a disk
+$ truncate -s 10G image.img
+
+# create a vm from iso with auto install data served by local web server
+$ kvm -no-reboot -m 2048 \
+    -drive file=image.img,format=raw,cache=none,if=virtio \
+    -cdrom ~/Downloads/ubuntu-22.10-live-server-amd64.iso \
+    -kernel /mnt/casper/vmlinuz \
+    -initrd /mnt/casper/initrd \
+    -append 'autoinstall ds=nocloud-net;s=http://_gateway:3003/'
+
+# another method is to create (not shown here) a seed iso image
+# and "mount" it as an additional drive
+$ kvm -no-reboot -m 2048 \
+    -drive file=image.img,format=raw,cache=none,if=virtio \
+    -drive file=~/seed.iso,format=raw,cache=none,if=virtio \
+    -cdrom ~/Downloads/ubuntu-22.10-live-server-amd64.iso
+
+# boot the new system
+$ kvm -no-reboot -m 2048 \
+    -drive file=image.img,format=raw,cache=none,if=virtio

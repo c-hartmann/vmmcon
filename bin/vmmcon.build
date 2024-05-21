@@ -1,0 +1,22 @@
+how to build it ...
+
+include code from other files (inside the code):
+include('other-file')
+
+replace every long comment ('###') with a single '#'
+m4 defs.m4 <input>
+
+get every short comment line out:
+| grep -vE '^\ *\t*# ' <input>
+
+get after code comments out:
+| sed 's/[^#]# .*//'
+
+( echo 'define(###,#) | m4
+
+oder:
+
+erst mit grep, sed etc. eine temp datei basteln und
+danach m4 auf traditionelle weise aufrufen:
+
+m4 my.m4 /tmp/my.temp

@@ -1,0 +1,20 @@
+# !UNTESTED AREA!
+
+# these are the ostypes, that vbox knows:
+# WindowsXP_64
+# Windows2003_64
+# WindowsVista_64
+# Windows2008_64
+# Windows7_64
+# Windows8_64
+# Windows81_64
+# Windows2012_64
+# Windows10_64
+# Windows2016_64
+# Windows2019_64
+# Windows11_64
+# WindowsNT_64
+
+# the vm_ostype given here might work or not as a command line parameter
+name=WINDOWS
+vm_ostype=Windows

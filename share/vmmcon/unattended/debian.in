@@ -1,0 +1,100 @@
+#_preseed_V1
+
+# read: 
+# https://www.debian.org/releases/stable/amd64/apbs03.en.html
+# https://www.debian.org/releases/stable/example-preseed.txt
+# https://gitlab.com/libosinfo/osinfo-db/-/blob/main/data/install-script/redhat.com/rhel-kickstart-jeos.xml.in
+
+# TODO:
+# does reading via an here document evaluates the variables?
+
+
+
+# global setting values following this style:  ${ui_<section>_<sub>}
+# or this: ${vmmcon_ui_<section>_[<subsec>_]<key>} ?
+# wemay be forced to allow subsubsecs
+
+
+# Using a DHCP server to specify preconfiguration files
+# It's also possible to use DHCP to specify a preconfiguration file to download from the network. DHCP allows specifying a filename. Normally this is a file to netboot, but if it appears to be an URL then installation media that support network preseeding will download the file from the URL and use it as a preconfiguration file. Here is an example of how to set it up in the dhcpd.conf for version 3 of the ISC DHCP server (the isc-dhcp-server Debian package).
+# if substring (option vendor-class-identifier, 0, 3) = "d-i" {
+#     filename "http://host/preseed.cfg";
+# }
+
+
+
+### Localization
+# Preseeding only locale sets language, country and locale
+# TODO: also keyboard?
+# d-i debian-installer/locale string en_US
+# d-i debian-installer/locale string en_GB.UTF-8
+d-i debian-installer/locale string ${ui_i10n_global}
+
+# or individualy (english interface with german timezone and keyboard)
+# d-i debian-installer/language string en
+# d-i debian-installer/country string DE
+#d-i debian-installer/locale string en_GB.UTF-8
+#d-i debian-installer/language string ${ui_i10n_language}
+#d-i debian-installer/country string ${ui_i10n_country}
+#d-i debian-installer/locale string ${ui_i10n_locale}
+# d-i keyboard-configuration/xkb-keymap select us
+d-i keyboard-configuration/xkb-keymap select ${ui_i10n_keyboard}
+
+
+
+### Network configuration
+# netcfg will choose an interface that has link if possible. This makes it
+# skip displaying a list if there is more than one interface.
+d-i netcfg/choose_interface select auto
+
+# Any hostname and domain names assigned from dhcp take precedence over
+# values set here. However, setting the values still prevents the questions
+# from being shown, even if values come from dhcp.
+d-i netcfg/get_hostname string ${ui_network_hostname}
+d-i netcfg/get_domain string ${ui_network_domainname}
+
+
+
+### Clock and time zone setup
+# Controls whether or not the hardware clock is set to UTC.
+# d-i clock-setup/utc boolean true
+d-i clock-setup/utc boolean true
+
+# You may set this to any valid setting for $TZ; see the contents of
+# /usr/share/zoneinfo/ for valid values.
+# d-i time/zone string US/Eastern
+d-i time/zone string ${ui_time_zone}
+# Controls whether to use NTP to set the clock during the install
+d-i clock-setup/ntp boolean true
+# NTP server to use. The default is almost always fine here.
+#d-i clock-setup/ntp-server string ntp.example.com
+
+
+
+### Account setup
+# Skip creation of a root account
+# (normal user account will be able to
+# use sudo).
+d-i passwd/root-login boolean false
+# To create a normal user account.
+d-i passwd/user-fullname string ${ui_accounts_userfullname}
+d-i passwd/username string ${ui_accounts_userlogname}
+# Normal user's password, either in clear text
+d-i passwd/user-password password ${ui_accounts_userpasswd}
+d-i passwd/user-password-again password ${ui_accounts_userpasswd}
+# Create the first user with the specified UID instead of the default.
+# d-i passwd/user-uid string 1000
+d-i passwd/user-uid string ${ui_accounts_useruid}
+
+
+
+### Partitioning
+#...
+
+
+### Boot loader installation
+# Grub is the boot loader (for x86).
+# This is fairly safe to set, it makes grub install automatically to the UEFI
+# partition/boot record if no other operating system is detected on the machine.
+d-i grub-installer/only_debian boolean true
+

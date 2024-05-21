@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=${VM}
+Comment=Virtual Machine
+Exec=
+Icon=
+Terminal=false
+Type=Application
+Categories=VirtualMachines;
+StartupNotify=true
+X-KDE-StartupNotify=true

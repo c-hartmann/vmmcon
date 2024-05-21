@@ -1,0 +1,17 @@
+# fedora.in
+# a kickstart file
+
+# read: 
+# https://linuxconfig.org/how-to-perform-unattended-linux-installations-with-kickstart
+
+rootpw --lock
+user --groups=wheel --name=tux --password=$6$fz9G6LVJIRHXk39j$IKgBBqkj9RQBWz8MylDWwViuREVTCIBwuxLEAeY0A6yniK2FIWBZDr9lH5YbUBidmBtqKR5CLA0h9AigOucCT/ --iscrypted --gecos="tux"
+
+### lang en_US.UTF-8
+### keyboard --vckeymap=us --xlayouts=us
+### timezone Europe/Rome --utc
+lang ${ui_i10n_language}
+keyboard --vckeymap=${ui_i10n_keyboard} --xlayouts=${ui_i10n_keyboard_variant}
+timezone ${ui_time_zone} --utc
+network --hostname=${ui_network_hostname} --device=eth0 --bootproto=dhcp --noipv6 --activate --onboot=yes
+xconfig --startxonboot

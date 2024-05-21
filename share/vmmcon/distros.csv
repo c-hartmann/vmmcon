@@ -1,0 +1,18 @@
+# BaseName first line hits;ServerOrDesktopOrOtherUsage;Architecture;Version/Release;RelaseNickname;SHA256;ListOfUrlsToDownload;localName
+Ubuntu;Desktop;23.04;amd64;Lunar Lobster;$(curl --silent 'http://www.cdimage.ubuntu.com/daily-live/current/SHA256SUMS' | head -1 | cut -d' ' -f1);http://www.cdimage.ubuntu.com/daily-live/current/lunar-desktop-amd64.iso;ubuntu-lunar-desktop-amd64.iso
+Kubuntu;Desktop;23.04;amd64;Lunar Lobster;92a1eca76a363a6fa8d2f5abd9c59c3d451463667b82d751f012b3bac9f7645b;http://cdimage.ubuntu.com/kubuntu/daily-live/current/lunar-desktop-amd64.iso;kubuntu-lunar-desktop-amd64.iso
+Ubuntu;Server;23.04;amd64;Lunar Lobster (Beta);https://releases.ubuntu.com/23.04/ubuntu-23.04-beta-live-server-amd64.iso
+Ubuntu;Desktop;22.10;amd64;Kinetic Kudu;https://download.ubuntu.com/...
+Ubuntu;Desktop;22.04;amd64;Jammy Jellyfish;https://download.ubuntu.com/...
+Ubuntu;Desktop;22.04.2 LTS;amd64;Jammy Jellyfish;https://download.ubuntu.com/...
+Ubuntu;Kubuntu;22.04;amd64;Jammy Jellyfish;https://download.ubuntu.com/...
+Ubuntu;Budgie;22.04;amd64;Jammy Jellyfish;https://download.ubuntu.com/...
+
+# notes:
+# walk the list top down: if ISO download is not existing / not available: use next line
+# local name is optional and therefore last in line
+# a not matching sha sum shall not stop an install but issue a warning
+# download path shall be user choosen (show a dialog)
+# $() for the checksum ensure stability as it is excuted in a subshell
+# can we fetch a creation date for every iso image online? (curl?)
+➜ $ date +'%Y-%m-%d' -d "$(curl -s --head 'http://www.cdimage.ubuntu.com/daily-live/current/lunar-desktop-amd64.iso;ubuntu-lunar-desktop-amd64.iso' | grep Last-Modified: | cut -d' ' -f2-)"

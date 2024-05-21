@@ -1,0 +1,33 @@
+# UAI Un Attended Installation
+
+## unattended installation depends on the installer
+
+Calamares:no:-:https://jonathancarter.org/2019/04/13/help-test-debian-live/
+Ubiquity:yes:preseed:https://wiki.ubuntu.com/UbiquityAutomation
+Debian-Installer:yes:preseed:
+
+Anaconda:yes:Kickstart::https://github.com/pykickstart/pykickstart/blob/master/docs/kickstart-docs.rst
+YaST:yes:AutoYaST: https://documentation.suse.com/sles/15-SP2/html/SLES-all/book-autoyast.html, https://doc.opensuse.org/projects/autoyast/
+
+## Installers used by Distros
+
+Calamares: ArcoLinux, Archcraft, CachyOS, Garuda Linux, Manjaro, Netrunner, Nobara, KaOS, KDE neon, Lubuntu, Sabayon Linux, Chakra, EndeavourOS, Peppermint OS, Artix Linux, OpenMandriva Lx , Q4OS, the Live medium of Debian, XeroLinux
+Debian-Installer: Debian, Ubuntu (für UAI)
+YaST: SUSE, openSUSE
+Anaconda: Red Hat Enterprise Linux, Oracle Linux, Scientific Linux, AlmaLinux, CentOS, MIRACLE LINUX, Qubes OS, Fedora, Sabayon Linux
+Ubiquity: Ubuntu (bis 22.04?), Linux Mint, Elementary OS, Peppermint OS, Kubuntu, LMDE(?)
+noch-ohne-Namen: Ubuntu (ab 22.04?)
+Solaris: jumpstart
+AIF (evtl. nicht mehr aktuell): Arch
+
+## Notes and Questions
+
+Calamares might learn unattended installations with a 'job' module. see: https://github.com/calamares/calamares/tree/calamares/src/modules
+Job modules can be written in Python. -> Isn't Kickstart written in Python as well? see: https://github.com/pykickstart/pykickstart, https://pykickstart.readthedocs.io/en/latest/
+Is there something similar for preseed files?
+
+
+https://github.com/linuxmint/ubiquity
+
+
+:

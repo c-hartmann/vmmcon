@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Directory
+GenericName=Startmenu Folder
+Name=Virtual Machines
+Name[de]=Virtuelle Maschinen
+Comment=Submenu for starting Virtual Machines
+Comment[de]=Untermenü zum Starten von Virtuellen Maschinen
+Icon=ksmserver

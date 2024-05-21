@@ -1,0 +1,14 @@
+[Desktop Entry]
+# if KDE struggles to update the menu, run kbuildsycoca5(1) within a terminal
+# TODO: some users might prefere to set the Icon by OS or by VMM
+Type=Application
+Version=1.0
+Name=${VM_NAME}
+GenericName=Virtual Machine Launcher
+Comment=Launch this Virtual Machine
+Icon=${VMMCON_DESKTOP_ENTRY_ICON}
+Exec=${VMMCON_PATH_CANONICAL} start --vmm=\"${VMM}\" \"${VM_NAME}\"
+Terminal=false
+Categories=VirtualMachines;Appliances;
+StartupNotify=false
+X-KDE-StartupNotify=false

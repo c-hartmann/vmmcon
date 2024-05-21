@@ -1,0 +1,20 @@
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+"http://www.freedesktop.org/standards/menu-spec/menu-1.0.dtd">
+<Menu>
+  <Name>Virtual Machines</Name>
+  <Menu>
+    <!-- fallback name of this directory entry -->
+    <Name>Virtual Machines</Name>
+    <!-- all the translations go into .directory file -->
+    <!-- file is in: .local/share/desktop-directories/ -->
+    <Directory>org.vmmcon.desktop-menu-category.directory</Directory>
+    <Include>
+      <Filename>virtualbox.desktop</Filename>
+      <Filename>virt-manager.desktop</Filename>
+    </Include>
+    <Include>
+      <!-- Category is the glue between this directory entry and individual VM entries -->
+      <Category>VirtualMachines</Category>
+    </Include>
+  </Menu>
+</Menu>

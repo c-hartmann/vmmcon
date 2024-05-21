@@ -1,0 +1,50 @@
+VirtualBox selbst benennt einen QED disk type (QEMU enahnced disk)
+
+ABER: Ist QEMU ein VMM? eher nicht!
+
+ABER: QEMU ist quasi die gemeinsame Basis all der Entwicklung rund um virt-shell
+
+libvirt ist technisch betrachtet der richtigere Name
+
+
+
+Wikipedia ...
+
+schreibt dazu:
+libvirt ist eine Sammlung quelloffener Werkzeuge zur Verwaltung von virtuellen
+Maschinen auf einem Hostsystem. Diese besteht aus einer Programmierschnittstelle
+(API), einem Daemon (libvirtd) und einem Kommandozeilenprogramm (virsh).
+
+aber auch:
+Mit Hilfe von libvirt ist es möglich, Hypervisortechnologien unterschiedlicher
+Hersteller wie beispielsweise KVM/QEMU, Xen, VMware, VirtualBox oder Hyper-V
+zu steuern und über eine einheitliche Schnittstelle zu bedienen.
+
+aha!
+Und hat damit Ähnlichkeiten zu vmmcon selbst! (präziser: virsh() ist das
+Pendant) (vmmsh() wäre demnach ein anderer zulässiger Name)
+
+aber was heißt das eigentlich?
+libvirt spricht den Hypervisor von VirtualBox an! hmmmm
+wobei der "primäre" Hypervisor aben QEMU ist.
+
+und nun?
+Irgendwie fühlt es sich nicht logisch an, über eine "Shell" (hier: virsh())
+noch eine Shell zu packen!
+Demnach müsste man QEMU "direkt" steuern ... aber wie kompliziert ist das?
+Kann QEMU eine VM in einem Fenster anzeigen? Oder ist das dann schon libvirt?
+
+
+
+wie sieht es mit Funktionalitäten aus?
+Kann QEMU Snapshots einer VM anlegen? Klonen?
+
+VBox und QEMU haben verdammt viel gemeinsam: Beide emulieren z.B. Grafik- und
+Netzwerkkarten, Soundkarten, parallel und serielle Schnittstellen (inkl. USB)
+usw usw... Im "schlimmsten Fall sogar eine "fremde" CPU Architektur.
+
+VBox und QEMU teilen sich sogar Quellcode!
+
+Sollte am Ende ein (fernes) Ziel von vmmcon sein, einen eigenen RDP basierten
+Fenster Container zu haben, in dem sowohl VBox als auch QEMU VMs laufen können?
+

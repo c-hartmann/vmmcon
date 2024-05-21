@@ -1,0 +1,22 @@
+solo:~$ ls -1 /usr/share/virtualbox/UnattendedTemplates/
+debian_postinstall.sh
+debian_preseed.cfg
+fedora_ks.cfg
+lgw_ks.cfg
+lgw_postinstall.sh
+ol8_ks.cfg
+ol9_ks.cfg
+ol_ks.cfg
+ol_postinstall.sh
+os2_cid_install.cmd
+os2_response_files.rsp
+os2_util.exe
+redhat67_ks.cfg
+redhat_postinstall.sh
+rhel3_ks.cfg
+rhel4_ks.cfg
+rhel5_ks.cfg
+ubuntu_preseed.cfg
+win_nt5_unattended.sif
+win_nt6_unattended.xml
+win_postinstall.cmd

@@ -1,0 +1,19 @@
+autoinstall:
+	version: 1
+	identity:
+		hostname: ${UNIN_NETWORK_HOST_NAME}
+		realname: ${UNIN_NORMAL_USER_REAL_NAME}
+		username: ${UNIN_NORMAL_USER_USER_NAME}
+		password: ${UNIN_ROOT_USER_PASS_CRYPTED} # WARNING crypted passwort might start with a $
+	keyboard:
+		layout: ${UNIN_INPUT_KEYBOARD_LAYOUT}
+		variant: ${UNIN_INPUT_KEYBOARD_VARIANT}
+	user-data:
+		disable_root: ${UNIN_CREATE_ROOT_USER}  # TODO not sure if meaning is identical to debian
+	locale: ${UNIN_LOCALE_GLOBAL}
+	ssh:
+		install-server: ...
+		authorized-keys: ...
+		allow-pw: ...
+	timezone: ${UNIN_TIMEZONE}
+	shutdown: reboot/poweroff

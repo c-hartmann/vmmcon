@@ -1,0 +1,23 @@
+# this file is part of vmmctl.sh
+# automagic.local.csv
+
+### use a local match table with precedence over the distributed one
+### first examle uses the full filename of an ISO image without it's extension
+### to match note that the template given here does not exists!
+slackware64-live-14.2;slackware
+
+### next is Bunsenlabs. These do not include the distro name in the ISO,
+### but just the nickname of the release, that is about to change with next one.
+Deuterium;debian
+Helium;debian
+Hydrogen;debian
+Lithium;debian
+Beryllium;debian
+
+### Peppermint switched from Ubuntu to Debian starting with Peppermint OS 11.
+### If you are planing to install an older variant, uncomment next line
+#Peppermint;ubuntu
+
+### Scientific (Short Form). Scientific is held for historical reasons, as it
+### is planed to be replaced by Cern and Fermilabs with AlmALinux
+#SL-;redhat

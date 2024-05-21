@@ -1,0 +1,201 @@
+{
+	"file": "automagic.json",
+	"version": 0.1,
+
+	"NOTES": [
+		"this file shall replace automagic.csv, the profiles and the matches directory",
+		"somehow this also might replace vmmconrc file via the fallbacks section. no! things like the preferred VMM shall go here? vbox unattended install is about the same. not here. on the other side ... if we remove the OS specific parts here, the personal parts is all that remains. so it *is* a replacement for the rc file",
+		"Should personal / local configuration into ~/.config/ ?",
+		"this file could be parsed into a bash configuration array (just) once (performancewise). keys like: fallbacks.vbox.vm_ostype (if dots are valid)"
+	],
+
+	"TODO": "beside jq(1) python JSON-lib might be an option to parse this",
+	"example_jq": "jq -r '.systems.neon.vbox.vm_ostype' < automagic.json",
+	"example_py": "python3 -c 'import sys, json; print(json.load(sys.stdin)[\"systems\"][\"neon\"][\"vbox\"][\"vm_ostype\"])' < automagic.json",
+	"example_py_2": "python -m json.tool ...",
+	"helpfull": "jq -s . heart_rate*.json > ../heart_rate.json (merges multiple json files)",
+
+	"filters": {
+		"bit64": {
+			"match": [ "amd64" ]
+		},
+		"bit32": {
+			"match": [ "i386" ]
+		}
+	},
+
+	"fallbacks":
+	{
+		"vbox":
+		{
+			"vm_ostype": "Linux_64",
+			"unattended_install": "false",
+			"unattended_install_setup": {
+				"user": {
+					"NOTE": "if uid or gid are not set, 'auto' will be used. 'auto' is automatic login",
+					"do": 1,
+					"name": "Christian Hartmann",
+					"id": "christian",
+					"pass": "hartmann",
+					"uid": 1000,
+					"gid": 1000,
+					"sudo": 1,
+					"auto": 1
+				},
+				"root": {
+					"do": 0,
+				},
+				"hostname": "auto||profile"
+			},
+			"remote_desktop": {
+				"MANUAL": "https://www.virtualbox.org/manual/ch07.html#idp8971072",
+				"enable": 0,
+				"port": 3389,
+				"auth_type": "null",
+				"server": "VBoxHeadless",
+				"client": "krdc"
+			}
+		},
+		"qemu": {
+			"vm_cpu_type": "base|host|max",
+			"vm_graphics_type": "qxl|vmware|virtio",
+			"vm_network_type": "e1000e",
+			"vm_audio_type": "intel_ac97",
+			"vm_chipset_type": "q35",
+			"vm_disk_type": "sata",
+			"vm_disk_bus": "sata|virtio"
+		},
+		"profiles": {
+			"minimal": {
+				"ram": 2048,
+				"disk": 4096
+			},
+			"default": {
+				"ram": 4096,
+				"disk": 8192
+			},
+			"comfort": {
+				"ram": 8192,
+				"disk": 16384
+			},
+			"server": {
+				"ram": 4096,
+				"disk": 8192
+			},
+			"desktop": {
+				"ram": 8192,
+				"disk": 16384
+			}
+		}
+	},
+	"systems": {
+		"minix-3.4rc": {
+			"comments": [
+				"this is mainly an example for a not all default setup of a vbox vm"
+			],
+			"iso": {
+				"match": "minix_R3\.4\.0rc.+\.iso"
+			},
+			"vbox": {
+				"comments": [
+					"Description: NetBSD (32-bit)"
+				],
+				"vm_ostype": "Other",
+				"unattended_install": "false",
+				"hdd_controller": "IDE",
+				"cpu_count": 1,
+				"main_memory": 1024,
+				"pointing_device": "ps2",
+				"network_adapter": "pcnet-fast-III AM79C973"
+			}
+		},
+		"minix-3.3": {
+			"iso": {
+				"match": "minix_R3\.3\.+.iso"
+			},
+			"vbox": {
+				"comments": [
+					"Description: NetBSD (32-bit)"
+				],
+				"vm_ostype": "Other",
+				"unattended_install": "false"
+			}
+		},
+		"ubuntu-desktop-amd64": {
+			"hostname": "ubuntu",
+			"iso": {
+				"TODO": [
+				  "should we have an array for pattern?",
+				  "should we mirror the download pathes locally (if we also download from urls?",
+				  "matching ubuntu might fail"
+				],
+				"comments": [
+					"https://releases.ubuntu.com/.",
+					"there are amd64 and i386 variants, at least for older releases"
+				],
+				"match": {
+				  "image": "ubuntu-[\n\.]+-desktop-amd64\.iso",
+				  "volume": "Ubuntu 23.10(.\d\+?)?(.\d\+?)? amd64"
+				},
+				"url": "https://cdimage.ubuntu.com/daily-live/current/mantic-desktop-amd64.iso",
+				"release": "ubuntu-([\n\.])+-desktop-amd64\.iso",
+				"name": "Ubuntu 64"
+			},
+			"vbox": {
+				"vm_ostype": "Ubuntu_64",
+				"unattended_install": "false"
+			},
+			"profiles": {
+				"minimal": {
+					"ram": 4
+				},
+				"default": {
+					"ram": 8
+				},
+				"comfort": {
+					"ram": 16
+				},
+				"server": {
+					"ram": 4096,
+					"disk": 8192
+				},
+				"desktop": {
+					"ram": 8192,
+					"disk": 16384
+				}
+			}
+		},
+		"ubuntu-server-amd64": {
+			"iso": {
+				"comments": [
+					"https://releases.ubuntu.com/.",
+					"newer SERVER releases do have the '-live' part in name, whereas older do not"
+				],
+				"match": "ubuntu-[\n\.]+(-live)?-server-amd64\.iso"
+			},
+			"vbox": {
+				"vm_ostype": "Ubuntu_64",
+				"vbox_unattended_install": "false"
+			},
+			"settings": {
+				"minimal": {
+					"ram": 2
+				},
+				"default": {
+					"ram": 4
+				},
+				"comfort": {
+					"ram": 8
+				}
+			}
+		},
+		"debian-amd64": {
+			"iso": {
+				"comments": [
+					"http://ftp.hosteurope.de/mirror/ftp.debian.org/debian-cd/12.0.0-live/amd64/iso-hybrid/"
+				],
+				"match": "debian(-live|-edu|-mac)?-[\n\.]+-amd64-[a-zA-z]+\.iso"
+			}
+		}
+	}
+}

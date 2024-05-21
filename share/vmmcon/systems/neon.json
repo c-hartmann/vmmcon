@@ -1,0 +1,15 @@
+{
+	"vbox":
+	{
+		"vm_ostype": "Ubuntu_64",
+		"vbox_unattended_install": "false"
+	},
+	"settings": {
+		"minimal": {
+			"ram": 2
+		},
+		"default": {
+			"ram": 4
+		}
+	}
+}

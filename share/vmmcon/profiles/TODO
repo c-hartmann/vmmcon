@@ -1,0 +1,5 @@
+profile name is currently taken from file name.
+
+shange this to an internal key 'profile' or  'profile_name'
+
+in the long run this will be replaced by the JSON based config

@@ -1,0 +1,26 @@
+# THIS IS JUST A TEMPLATE FOR TEMPLATES
+
+name=README.sample
+
+### this is for Linux images only and most of them exist in 64 bit variant
+vm_ostype=Linux_64
+
+### most newer linux make use of 3D accelaration feature if present
+### so we do (via teh BASE.conf although it defaults to off and requires
+### guest additions being installed
+### some newer linux distros install virtualbox guest additions by
+### default if foun to be running inside such a system. if installed you
+### are able to set display size through the shell window menu "Display"
+vm_gfx_accelerate3d="on"
+
+### enabling UEFI allows higher display resoulutions during installation
+vm_firmware="bios" # bios|efi|efi32|efi64
+
+### main memory: 4 GB
+vm_memory_size=4096
+
+### graphic memory size: 128 MB (maximum in GUI)
+vm_vram_size=128
+
+### hard disk size: 20 GB
+vm_disk_size=20
