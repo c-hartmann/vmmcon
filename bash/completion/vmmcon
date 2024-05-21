@@ -1,0 +1,45 @@
+# file: /etc/bash_completion/vmmcon
+
+# function to create different completions
+_vmlist_vbox()
+{
+	#vmmcon list "$cur" 2>/dev/null | tail +2
+	vms=()
+	while read vm; do vms+=("$vm"); done < <(vmmcon list "$cur" 2>/dev/null | grep -v '^$')
+	#COMPREPLY=( $( compgen -W "${vms[@]}" -- $cur ) )
+	COMPREPLY=("${vms[@]}")
+}
+_vmmcon()
+{
+	local cur prev command module i
+
+	# init the reply array
+	COMPREPLY=()
+
+	# latest character(s) typed so far
+	cur="${COMP_WORDS[COMP_CWORD]}"
+
+	# previous word typed so far
+	#prev="${COMP_WORDS[$COMP_CWORD - 1]}"
+	prev=${COMP_WORDS[COMP_CWORD-1]}
+
+	# no command given so far
+	if [[ $COMP_CWORD -eq 1 ]] ; then
+		COMPREPLY=( $( compgen -W "create launch list \
+                        start \
+                        status" -- $cur ) )
+	else
+			case $prev in
+				start)
+					_vmlist_vbox
+					return 0
+					;;
+			esac
+
+			#COMPREPLY=( $( compgen -W "$options" -- $cur ) )
+	fi
+
+}
+# main
+complete -F _vmmcon vmmcon
+
