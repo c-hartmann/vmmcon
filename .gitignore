@@ -1,2 +1,6 @@
 
 .directory
+bin/vmmctl.README
+bin/vmmctl.d.README
+bin/vmmcon.in.test
+bin/vmmcon.insert

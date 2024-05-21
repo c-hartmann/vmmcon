@@ -1,0 +1,18 @@
+while read line
+do
+	if [[ "${line}" =~ ^Name:* ]]
+	then
+		name_line="${line}"
+#set -x
+		name="${name_line#Name:}"
+#		name="${name## }"
+		name="$(echo $name)"
+#set +x
+	fi
+	if [[ "${line}" =~ ^State:* ]]
+	then
+		state_line="${line}"
+		state=$(echo "{$state_line}" | grep --extended-regexp 'saved|running|powered off|aborted-saved' --only-matching)
+		echo "${name}  ${state}"
+	fi
+done < <(vboxmanage list --long vms 2>/dev/null)
