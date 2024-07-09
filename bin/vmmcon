@@ -113,7 +113,7 @@ Commands:
   exec <vm> <command>           Tries to execute a command either via ssh(1) or other mechanisms
 
   list                          List all VMs
-  list <name>                   List VMs with names matching <name>
+  list <name>                   List VMs with names starting with <name>
 
   export <vm>                   Export an existing VM by its name as Appliance
   import <app> [<vm>]           Create a new VM from an application container  # TODO: use existing VM name / Auto (re)name?
@@ -539,6 +539,16 @@ function _error_exit()
 	exit ${2:-1}
 }
 
+### _plain_exit
+### even more simple error handling
+function _plain_exit()
+{
+	$gui && kdialog --msgbox "$*" --ok-label 'OK'
+	$cli && printf "\n%s: %s\n\n" "$1" >&2
+	# shellcheck disable=SC2086 # shall be an integer - no sring quoting
+	exit ${2:-1}
+}
+
 ### _canceled_exit
 function _canceled_exit()
 {
@@ -933,7 +943,8 @@ function _init_vm_memory_size()
 function _get_simple_name()
 {
 	### TODO: check result (on being niot empty) before returning?
-	# replace spaces with underscores, strip '(' and ')'
+	# replace some characters with underscores, strip every '(' and ')'
+	# TODO: doable with Bash string operations?
 	local _complex_name="$1"
 	printf '%s' "$_complex_name" | sed 's/[ !$/\]/_/g' | sed 's/[()]//g'
 }
@@ -1075,10 +1086,10 @@ function _search_desktop_entry() # $VM
 valid_commands=( \
 "clone" \
 "close" \
+"commands" \
 "create" \
 "create-desktop-entry" \
 "create-ssh-login" \
-"create-from-iso" \
 "create-group" \
 "delete" \
 "delete-desktop-entry" \
@@ -1105,7 +1116,6 @@ valid_commands=( \
 "readdocs" \
 "reboot" \
 "remove" \
-"remove-desktop-entry" \
 "rename" \
 "reset" \
 "restart" \
@@ -1119,6 +1129,7 @@ valid_commands=( \
 "stop" \
 "state" \
 "status" \
+"suspend" \
 "ssh" \
 "ungroup" \
 "up" \
@@ -1195,7 +1206,11 @@ function _run_command()
 			_exit=$_cloned
 			_return=$_cloned
 		;;
-		create | create-from-iso | new | launch | up )
+		commands ) # just a simple list of commands for bash completion
+			echo ${valid_commands[@]}
+			_return=0
+		;;
+		create | new | launch | up )
 			_created=1
 			### if filepath not set via option -f, use first argument instead
 			if [[ -z "$filepath" ]]; then
@@ -1651,9 +1666,10 @@ function _run_command()
 			_exit=0
 			_return=0
 		;;
-		list | search )
+		list )
 			# TODO: use -l for vms with group names? or -g?
-# 			[[ -z "${_argv[1]+x}" ]] || _error_exit "This command do *not* require an argument. you might want 'query' instead to search for a VM ($LINENO)"
+# 			[[ -z "${_argv[1]+x}" ]] || _error_exit "This command do *not* require an argument. 
+#			you might want 'search' instead to search for a VM ($LINENO)"
 			if [[ -z "${_argv[1]+x}" ]]; then
 				# no argument given
 				if $list_running; then
@@ -1749,8 +1765,11 @@ function _run_command()
 			_return=0
 		;;
 		reboot | restart )
-			_error_exit "Command not yet implemented ($LINENO): '$_command'. Realy sorry"
+			_error_exit "Command not yet implesearchmented ($LINENO): '$_command'. Realy sorry"
 			_return=1
+		;;
+		remove )
+			_error_exit "Command not yet implemented ($LINENO): '$_command'. Realy sorry"
 		;;
 		### NOTE: move is *not* propagated synonym for rename as the term might be used in future 
 		###       implementations to "physically" move a VM to a different storage location
@@ -1789,7 +1808,10 @@ function _run_command()
 			fi
 			_return=$_purged
 		;;
-		resume | restore ) # from a 'paused' state
+		resume | restore ) # from a 'paused' or 'suspended' state
+			_error_exit "Command not yet implemented ($LINENO): '$_command'. Realy sorry"
+		;;
+		search )
 			_error_exit "Command not yet implemented ($LINENO): '$_command'. Realy sorry"
 		;;
 		search-desktop-entry )
@@ -1839,7 +1861,7 @@ function _run_command()
 		state | status )
 			[[ -z "${_argv[1]+x}" ]] && _error_exit "This command requires an argument ($LINENO)"
 # 			vmms::vm_exists "${_argv[1]}" && printf '%s\n' "vm exists"
-# 			vmms::vm_is_running "${_argv[1]}" && printf '%s\n' "vm is running"
+# 			vmms::vm_is_running "${_argv[1]}" && printf '%s\n' "vm is running"tatus
 # 			vmms::vm_is_stopped "${_argv[1]}" && printf '%s\n' "vm is stopped"
 			_vm=$(vmms::query_vm "${_argv[1]}" | head -1)
 			vmms::vm_is_running "${_vm}" && printf '%s\n' "vm is running"
@@ -1859,6 +1881,9 @@ function _run_command()
 			vmms::stop_vm "${_vm}" && _stopped=0
 			_exit=$_stopped
 			_return=$_stopped
+		;;
+		'suspend' ) # '' to indicate this as a fixed string?
+			_error_exit "Command not yet implemented ($LINENO): '$_command'. Realy sorry"
 		;;
 		ungroup )
 			# if group is empty after removing vm, it will be deleted
@@ -1952,7 +1977,7 @@ fi
 if [[ $# -gt 0 ]]; then
 	given_comand="$1"
 else
-	_error_exit "$MY_NEW_NAME requires a command. try '$MY_NEW_NAME help' for a list of commands"
+	_plain_exit "$MY_NEW_NAME requires a command. try '$MY_NEW_NAME help' for a list of commands"
 fi
 # for command in ${valid_commands[*]}; do
 for command in "${valid_commands[@]}"; do

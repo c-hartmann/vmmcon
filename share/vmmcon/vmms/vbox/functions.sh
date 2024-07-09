@@ -521,12 +521,14 @@ function vmms::purge_vm_saved_state()
  	_vbox_manage 2 discardstate "$_vm"
 }
 # TODO: common name scheme? all starting with vm_?
+# TODO: could / should be merged with vmms::list_vms (checkig for given argument)
+# TODO: or modify this into a more complex search function
 function vmms::query_vm() # "$QUERY"
 {
 	local _vm="$1"
 # 	vmms::list_vms | ( echo; grep -i -e "$_vm" ) | sort
 	# treat distro version numbers as being important and list newest first
-	_vbox_list_vms_helper_getter | grep -i -e "$_vm" | _vbox_list_vms_helper_sorter
+	_vbox_list_vms_helper_getter | grep -i -e "^$_vm" | _vbox_list_vms_helper_sorter
 }
 # TODO: common name scheme? all starting with vm_?
 function vmms::reboot_vm() # "$VM"
