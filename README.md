@@ -26,3 +26,4 @@ The core of this tool is a large Bash script. Additionaly it comes with some Des
 - user configurable alias commands
 - extract initial desktop integration parts
 - respect user env profile settings
+- complete refactor it
