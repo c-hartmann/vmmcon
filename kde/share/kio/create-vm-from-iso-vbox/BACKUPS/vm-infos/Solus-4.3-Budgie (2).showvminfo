@@ -1,0 +1,145 @@
+Name:                        Solus-4.3-Budgie (2)
+Groups:                      /
+Guest OS:                    Debian (64-bit)
+UUID:                        fba91687-8675-4338-95cc-b720da04923d
+Config file:                 /home/christian/.VirtualBox/VMs/Solus-4.3-Budgie (2)/Solus-4.3-Budgie (2).vbox
+Snapshot folder:             /home/christian/.VirtualBox/VMs/Solus-4.3-Budgie (2)/Snapshots
+Log folder:                  /home/christian/.VirtualBox/VMs/Solus-4.3-Budgie (2)/Logs
+Hardware UUID:               fba91687-8675-4338-95cc-b720da04923d
+Memory size:                 4096MB
+Page Fusion:                 disabled
+VRAM size:                   128MB
+CPU exec cap:                100%
+HPET:                        disabled
+CPUProfile:                  host
+Chipset:                     piix3
+Firmware:                    BIOS
+Number of CPUs:              1
+PAE:                         disabled
+Long Mode:                   enabled
+Triple Fault Reset:          disabled
+APIC:                        enabled
+X2APIC:                      enabled
+Nested VT-x/AMD-V:           disabled
+CPUID Portability Level:     0
+CPUID overrides:             None
+Boot menu mode:              message and menu
+Boot Device 1:               Floppy
+Boot Device 2:               DVD
+Boot Device 3:               HardDisk
+Boot Device 4:               Not Assigned
+ACPI:                        enabled
+IOAPIC:                      enabled
+BIOS APIC mode:              APIC
+Time offset:                 0ms
+RTC:                         UTC
+Hardware Virtualization:     enabled
+Nested Paging:               enabled
+Large Pages:                 disabled
+VT-x VPID:                   enabled
+VT-x Unrestricted Exec.:     enabled
+Paravirt. Provider:          KVM
+Effective Paravirt. Prov.:   KVM
+State:                       running (since 2022-01-16T10:57:52.881000000)
+Graphics Controller:         VMSVGA
+Monitor count:               1
+3D Acceleration:             disabled
+2D Video Acceleration:       disabled
+Teleporter Enabled:          disabled
+Teleporter Port:             0
+Teleporter Address:          
+Teleporter Password:         
+Tracing Enabled:             disabled
+Allow Tracing to Access VM:  disabled
+Tracing Configuration:       
+Autostart Enabled:           disabled
+Autostart Delay:             0
+Default Frontend:            
+VM process priority:         default
+Storage Controller Name (0):            IDE
+Storage Controller Type (0):            PIIX4
+Storage Controller Instance Number (0): 0
+Storage Controller Max Port Count (0):  2
+Storage Controller Port Count (0):      2
+Storage Controller Bootable (0):        on
+Storage Controller Name (1):            SATA
+Storage Controller Type (1):            IntelAhci
+Storage Controller Instance Number (1): 0
+Storage Controller Max Port Count (1):  30
+Storage Controller Port Count (1):      1
+Storage Controller Bootable (1):        on
+IDE (0, 0): /home/christian/Downloads/ISOs/Linux/solus/Solus-4.3-Budgie.iso (UUID: d9a19816-f414-4391-9bd8-393ded867cb2)
+SATA (0, 0): /home/christian/.VirtualBox/VMs/Solus-4.3-Budgie (2)/Solus-4.3-Budgie (2).vdi (UUID: ae2dede4-9ede-4f4b-8cf4-b8e4b1df433e)
+NIC 1:                       MAC: 0800276AB6CE, Attachment: NAT, Cable connected: on, Trace: off (file: none), Type: 82540EM, Reported speed: 0 Mbps, Boot priority: 0, Promisc Policy: deny, Bandwidth group: none
+NIC 1 Settings:  MTU: 0, Socket (send: 64, receive: 64), TCP Window (send:64, receive: 64)
+NIC 2:                       disabled
+NIC 3:                       disabled
+NIC 4:                       disabled
+NIC 5:                       disabled
+NIC 6:                       disabled
+NIC 7:                       disabled
+NIC 8:                       disabled
+Pointing Device:             USB Tablet
+Keyboard Device:             PS/2 Keyboard
+UART 1:                      disabled
+UART 2:                      disabled
+UART 3:                      disabled
+UART 4:                      disabled
+LPT 1:                       disabled
+LPT 2:                       disabled
+Audio:                       enabled (Driver: PulseAudio, Controller: AC97, Codec: STAC9700)
+Audio playback:              disabled
+Audio capture:               disabled
+Clipboard Mode:              disabled
+Drag and drop Mode:          disabled
+Session name:                GUI/Qt
+Video mode:                  800x600x32 at 0,0 enabled
+VRDE:                        disabled
+OHCI USB:                    enabled
+EHCI USB:                    enabled
+xHCI USB:                    disabled
+
+USB Device Filters:
+
+<none>
+
+Available remote USB devices:
+
+<none>
+
+Currently Attached USB Devices:
+
+<none>
+
+Bandwidth groups:  <none>
+
+Shared folders:<none>
+
+VRDE Connection:             not active
+Clients so far:              0
+
+Capturing:                   not active
+Capture audio:               not active
+Capture screens:             
+Capture file:                /home/christian/.VirtualBox/VMs/Solus-4.3-Budgie (2)/Solus-4.3-Budgie (2).webm
+Capture dimensions:          1024x768
+Capture rate:                512kbps
+Capture FPS:                 25kbps
+Capture options:             
+
+Description:
+this VM has been created by:  CreateVMfromISOVBox
+Guest:
+
+Configured memory balloon size: 0MB
+OS type:                     Linux26_64
+Additions run level:         1
+Additions version:           6.0.0 r127566
+
+Guest Facilities:
+
+Facility "VirtualBox Base Driver": active/running (last update: 2022/01/16 10:58:05 UTC)
+Facility "Seamless Mode": not active (last update: 2022/01/16 10:58:05 UTC)
+Facility "Graphics Mode": not active (last update: 2022/01/16 10:58:05 UTC)
+
+

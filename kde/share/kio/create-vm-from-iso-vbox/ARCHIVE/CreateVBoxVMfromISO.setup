@@ -1,0 +1,25 @@
+### this is for planed but yet to come unattended installation...
+
+realname="Christian Hartmann"
+username=christian
+userpass=Orange01
+rootpass=Orange01       # Debian requires a root user
+vm_user_uid=1000
+vm_user_gid=1000
+autologin=true
+
+language=en
+locale=en_US.UTF-8
+keyboard=de
+keyboard_variant=no-dead-keys
+location=Germany
+tz=Europe/Berlin
+
+hostname=vbox           # or just accept installers default? anyhow we set this from template or match or ?
+domain=local            # Debian asks for that one, but can be left alone (empty)
+
+diskdevice=sda          # generaly just that
+disklayout=entire       # nothing else supported so far
+diskpartitions='/'      # could be diveded by comma or semi colon or colon? if splitted up by tr, it might be all of them
+grubtodisk=true
+grubdevice=sda

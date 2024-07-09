@@ -1,0 +1,40 @@
+### this is for planed but yet to come unattended installation in virtualbox...
+
+
+# syntax: vmmctl-vbox create --setup --auto --iso /path/to/downloads/isos/linux/joes-0.0.1-2022-05-28-x86_64.iso
+
+
+
+vm_setup_username=christian            # --user=...
+vm_setup_userpass=Orange01             # --password=...
+vm_setup_realname="Christian Hartmann" # --full-user-name=...
+
+#vm_setup_rootpass=Orange01             # Debian requires a root user. root user is created automatically with the same pass as user
+#vm_setup_useruid=1000
+#vm_setup_usergid=1000
+#vm_setup_autologin=true
+
+vm_setup_language=en                   # --language=...
+vm_setup_locale=en_US.UTF-8            # --locale=... (may be just e.g. de_DE)
+vm_setup_keyboard_layout=de
+vm_setup_keyboard_model=pc105
+vm_setup_keyboard_variant=no-dead-keys
+vm_setup_location=Germany              # --country=CC ... (DE for Germany)
+vm_setup_tz=Europe/Berlin              # --time-zone=... (default: host time zone or UTC)
+
+vm_setup_domain=local                  # Debian asks for that one, but can be left alone (empty)
+vm_setup_hostname=vbox                 # --hostname=FQDN .. so vbox.local, or ${match_l}.vmmctl.org (would this make problems later)
+                                       # or just accept installers default? anyhow we set this from template or match or ?
+
+# ???
+--script-template=file
+--post-install-template=file
+--post-install-command=command
+
+
+
+vm_setup_diskdevice=sda          # generaly just that
+vm_setup_disklayout=entire       # nothing else supported so far
+vm_setup_diskpartitions='/'      # could be diveded by comma or semi colon or colon? if splitted up by tr, it might be all of them
+vm_setup_grubtodisk=true
+vm_setup_grubdevice=sda

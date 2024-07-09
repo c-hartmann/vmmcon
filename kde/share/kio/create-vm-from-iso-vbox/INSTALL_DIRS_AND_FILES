@@ -1,0 +1,364 @@
+vmctl install guide
+
+
+environment:
+VMMCTL_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+VMMCTL_CONFIG_DIR ?
+
+VMMCTL_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share"
+VMMCTL_SHARE_HOME ?
+VMMCTL_SHARE_DIR ?
+
+or short:
+VC_		# VC is for Virtual Console (up to 6, X11 runs on 7)
+
+BX_ is used by Bochs (pronounced Box)
+
+
+technically the term 'provisioning' might be more acurate than that simple 'creation'
+
+'vmc' is taken :(
+https://github.com/lencap/vmc, https://github.com/lencap/vm
+
+'VMC' is also for VMware Cloud :(
+
+Chrome OS seems to use 'vmc' for VM Container
+"Containers on ChromeOS can be controlled via the "vmc" command from the ChromeOS Terminal (CTRL + ALT + T)."
+
+'vc' is not taken by anyone  :)
+
+aaaaaaa!
+https://man.openbsd.org/vmctl.8
+https://github.com/OpenMPDK/vmctl
+
+? switch back to vmmctl? even others name is VMM and it sits 'on top' of VMMs
+> YES
+
+
+_get_home_relative_directories_from_environment ($PATH) {...} # returns a list of directories included in PATH relative to HOME (i.e. being a subdirectory, i.e. dir path trimmed left by HOME is not equal to itself (includes empty) and exists (if flag set))
+_get_first_home_relative_directory_from_environment ($PATH) {...} # flag: confirm to xdg: if .local/bin is set, return this, otherwise first in list
+VMMCTL_BIN_DIR="$(_get_first_home_relative_directory_from_environment)"
+VMMCTL_BIN_DIR="${VMMCTL_BIN_DIR:-$HOME/.local/bin"
+VMMCTL_BIN_DIR="${VMMCTL_BIN_DIR:-$(_get_first_home_relative_directory_from_environment)"
+VMMCTL_EXEC_DIR # xdg uses the terme Executable, and Desktop Extry Spec has Exec key, which we make heavy use of. is we use EXEC, than we should prefer DATA over SHARE
+
+
+soft default		installer default			hard default		action						TODO
+
+bin:
+.local/bin/			first dir in ~ from PATH	.local/bin/			add to PATH in .bashrc		add function to installer or extras
+.local/bin/vmctl.sh
+.local/bin/vmctl      -> ./vmctl.sh
+.local/bin/vmctl-vbox -> ./vmctl.sh  # use this in desktop integration?
+.local/bin/vmctl-qemu -> ./vmctl.sh
+
+
+
+config:
+.config/
+.config/vmctl.conf							? should this be a sample first						? load via env variabel VMMCTL_CONF and command line option --config (requires new run concept with defered settings. this is already there from --option ) ?
+.config/vmctl.conf.sample																		? isn't this actualy a rc file, as it is executed and should be placed into ~/.vmctlrc ?
+.config/vmctlrc								? or this name ?
+.config/vmctlrc.sample						respectively .. rc seems way more suited as this is a bash script ;)
+
+
+TODO:
+wie würde das aussehen, wenn es eine systemweite Konfiguration gäbe? Diese würden(!) wir installieren, oder? Aber was würde darin enthalten sein? Eher Verhalten, statt Parameter?
+
+TODO:
+move all dirs and files in vmctl.d one up and delete vmctl.d
+
+
+share:
+.local/share/vmmctl/
+.local/share/vmmctl/profiles/
+.local/share/vmmctl/profiles.local/
+.local/share/vmmctl/matches/
+.local/share/vmmctl/vmms/
+.local/share/vmmctl/vmms/vbox/
+.local/share/vmmctl/vmms/qemu/
+.local/share/vmmctl/templates/
+.local/share/vmmctl/templates/xdg/
+.local/share/vmmctl/icons [opt]
+.local/share/vmmctl/docs [opt]
+
+
+.local/share/vmmctl/vmctl.d/automagic.csv														? different concept? create a function? using the table from an array? ? directory? run all scripts inside, that might set different things like architecture, memory? mainly derived from ISO file name, but not limited to
+.local/share/vmmctl/vmctl.d/automagic.local.csv													? rename to automagic-local.csv, ? use a directory with a set of files with functions?
+.local/share/vmmctl/vmctl.d/profiles/*.conf														same here: ? could this be merged with a config script directory
+.local/share/vmmctl/vmctl.d/profiles.local/
+																								? profilers ? detectors ? wizards ?
+																								? global 8and commadn line) switch for chossing either mininal or recommended settings ?
+
+																								? --profile=auto ? what's the purpose of --profile?: to set the option vm_ostype .. that does not do anything by
+																								itself (instead of the GUI!). what's about the other base params, such aus main memory, disk size and other? These
+																								are also perfect candidats for a basic question set, even the unattended setup set, such as the user..
+
+.local/share/vmmctl/create.d/vbox-os-type.sh				# set vbox' os_type from ISO file name or last default to vm_os_type. this should be named vbox_os_type (könnte auf der vorhandenen automagic Datei basieren)
+.local/share/vmmctl/create.d/vbox-os-type-i386.sh		    # reset vbox os_type to 32 bit from ISO file name
+.local/share/vmmctl/create.d/qemu-os-type.sh				#
+.local/share/vmmctl/create.d/xdg-desktop-entry.sh		    # creates the xdg desktop entry
+.local/share/vmmctl/create.d/all-
+.local/share/vmmctl/create.d/set-the-boot-option-to-either-bios-or-efi.sh						? aber woran mache ich das fest? so wie QuickEmu ?
+																								- am Ende schon in erster Linie am Namen der ISO ... ein 'match' (name) Skript kann das anhand einer
+																								  eigenen Konfiguration entscheiden oder z.B. an einer in Namen der ISO enthaltenen Versionsnummer
+																								  (größer oder kleiner als n.n.n.)
+
+.local/share/vmmctl/config[ure].d/                                                              ? anderer Name ?
+
+> the .d/ pattern is generaly applied to confings that start with a .conf file and get a corresponding .d directory. BOTH apply!  we have a different thing here
+.local/share/vmmctl/configs/                                                                    ? anderer Name ? the corresponding command line options is --auto-config. configs is a nice short of configuration-scripts !?
+.local/share/vmmctl/matches/                                                                    ? oder dies. naaa, keene Streichhölzer nich
+
+
+each file therein will be started and shall detect itself, if it's settings apply to the ISO or not.
+For instance they could match by bash regular expression it's own basename again the ISO file name first:
+[[ -v $1 ]] || exit 1
+ME_FILE=$(basename $0)
+ME=${ME_FN%.sh}
+# all scripts shall have 644 (not 755)
+#ME=${$(basename $0)%.sh}
+ME=$(basename $0 | sed 's/\.\w*$//')   # allows arbitrary shell script extensions (.bash) ... but why .. the creator of the script should know it .. and to set options the script shall be sourced, not executed!
+ME=$(basename $0 | sed 's/\.[^.]*$//') # same but different
+ME=$(basename -s '.sh' "$0")
+ISO="$(basename $1)"
+DIR="$(basename (dirname $1))"
+
+if [[ $ISO ~= $ME ]] ; then
+	vbox_os_type_base=Debian
+	exit 0
+fi
+# split these into separate match scripts: match-iso-name-partial.sh and match-directory-name-full.sh
+# this would allow crazy things
+if [[ $DIR ~= $ME ]] ; then
+	vbox_os_type=Debian
+	exit 0
+fi
+
+
+# internal defaults (i.e. without(!) --auto-config):
+vbox_os_type_base='Linux'
+vbox_os_type_bits=32
+
+# otherwise it is build from this
+vbox_os_type_base=${vbox_os_type_base:-Linux}
+vbox_os_type_bits=${vbox_os_type_bits:-32}
+function get_vbox_os_type # vbox_os_type_base vbox_os_type_bits
+{
+	local vbox_os_type
+	local vbox_os_type_base=$1
+	local vbox_os_type_bits=$2
+
+	if [[ vbox_os_type_bits ~= 64 ]] ; then
+		vbox_os_type=${vbox_os_type_base}_64
+	else
+		vbox_os_type=${vbox_os_type_base}
+	fi
+	printf '%s' $vbox_os_type
+}
+
+# the architecture detect script might be called by this function and might set
+# vbox independend values in first place ... vbox script might set their values
+# from that ...
+
+# this migth end up with a three types of auto config scripts:
+configs/generic|all|base -> setting: vm_base_target_arch=i386,amd64|x86_64|x64,arm,arm64
+# https://en.wikipedia.org/wiki/X86-64
+configs/vbox
+configs/qemu
+
+
+! das VBoxLinuxAdditions.run "Skript" hat dasu ab Zeile 710 auch eine nette Erkennung
+! das autorun.sh Skript hat es auch und besser
+> cpu=x86 oder cpu=amd64
+> später im Skript ist es dan naber ARCH
+> im Dateisystem sind es i386 und x86_64
+$ uname -m (aktuelles Neon)
+> x86_64
+$ uname -m (redhat 7.x Valhalla)
+> i686
+! viele Debian Pakete aber haben 'amd64' im Namen. AMD zu nutzen zollt auch irgendwie Respekt. Wer hat's erfunden?
+
+
+
+# and obviously there is no need to run qemu scripts if vbox is the VMM
+
+# installation process might even been stopped on unusabel combinations of architecture and VMM
+
+# https://stackoverflow.com/questions/53364320/the-most-correct-way-to-refer-to-32-bit-and-64-bit-versions-of-programs-for-x86
+# patterns to detect: x86-64 or x86_64
+
+
+new terms:
+- --auto-config (the vm, derived from OS type, but actualy independent), (vm name)
+
+- --auto-install (the OS, definitly OS dependend), (vm name) (anything that is not configured via $ME.conf)  this could be done headless .. so the first time user sees the real thing, it is already setup/installed by his personal definitions
+- --auto-setup (the system. very much OS dependent)  feeding the INSTALLER with preseeds is actualy --auto-install
+
+>
+.../vmmctl.config   # all internal config settings (or 'vmmctlrc' s.a.)
+.../vmmctl.preseed  # all user specific setup / install settings
+
+
+
+- --auto-start  --auto-power-up  --power-up ?
+
+directory names shall reflect these new names:
+
+? what is (my) configuration (e.g. user sprecific setup stuff) and what is app-only configuration ?
+
+> user shall never modify data in share !
+
+? are user owned files in config some sort of a .local stuff ?
+? can files in config serve the same purpose as such in share ?
+
+! no of the options allowed in vmmctlrc shall be active by installation !
+  these are all commented
+
+> https://www.virtualbox.org/manual/ch03.html [Chapter 3. _Configuring_ Virtual Machines] !
+> https://www.techtarget.com/searchvmware/definition/virtual-machine-configuration
+- Virtual machine configuration is the arrangement of resources assigned to a virtual machine.
+  The resources allocated to a virtual machine (VM) typically include allocated processors,
+  memory, disks, network adapters and the user interface.
+
+
+HOWTO disable xdg desktop entry creation for just one new VM? --disable=xdg ? --no-desktop, or enable(!) by default via context menu only with --desktop, or --xdg
+
+something to learn from VAGRANT here?
+
+.local/share/vmmctl/create.d/
+v.
+.local/share/vmmctl/create.d/${VMM}/
+v.
+.local/share/vmmctl/vmms/${VMM}/create.d/
+
+
+!!! --minimum/--minimal v. --recommended !!!
+HOWTO do this !?!? how could contributors contribute to this? we have the matched.d directory ... with a simple switch inside? if MIN, elseif RECOM else (default)...
+--minimum should be the default! the only thing, that can not easily be adjusted is disk size. main, graphics memory, graphics adapter, all these can be adjusted later...
+this is for distro hoppers .. these have to be "sparsam" on disk space and main memory
+* this also requires a default setup (as we install a lot of VMs, minimal shall be default)
+? but how to name the config option ?
+- vm_config_mode=minimal
+- vm_config_setup=default
+
+- vm_config_level=recommended
+- vm_resource_level=...   # AWS uses this term
+- vm_config_resource_level=...
+- vm_config_resources_level=...
+
+? how to translate this to config files ?
+.local/share/vmmctl/configs/ubuntu.conf
+.local/share/vmmctl/configs/ubuntu.default.cfg
+.local/share/vmmctl/configs/ubuntu.minimum.cfg
+.config/vmmctl/configs/ubuntu.default.sh / *.rc
+> execute all 'matching' scripts in share first and in config second ? should do the job
+
+
+! minimum should be a default .. as we are creating a lot of VMs .. right?
+
+! this does not need a complex configuration, but one config script for specific
+  distribution or a generic one for all derived distributions. (what the magic file
+  does by now). this shall all be set within config (bash) scripts.
+
+
+
+* even the automatic configuration of cpu count and main memory calculation might be done through this .. somehow
+.local/share/vmmctl/configs/all.sh
+.local/share/vmmctl/configs/auto.sh
+.local/share/vmmctl/configs/all-auto-cpu-count.sh
+.local/share/vmmctl/configs/all-auto-memory-size.sh
+? how to disable these all files ?
+? create an empty file in .config/ ?
+? re-write the file in .config ?
+
+
+
+? where to read the values ?
+! these are about to change over versions of one distro !
+? have a list or directory files matching parts of all known ISO files ?
+- some might be less matching and set options for all versions of a given distro
+- very little but some distros changed their base from e.g. Debian to Ubuntu or vice versa over time
+- some might set the architecture part (basicly distro independent) (as 'amd64' is the same as 'x86_64' or '64bit', symlinks serves this problem best)
+-- this could even turned around .. default to 32 bit and set via match to 64 .. as old ISO do not specify this and are likely just 32 bit
+s- solves the problem, where ISOs don't make use of the distro name (bunsenlabs or old red hats)
+- one file per match is way better than a large database
+? how can these get ordered ?
+? with numbers leading ... as in /etc/rc.d/..
+? sort the files by length in nae .. risky business
+
+
+
+
+v.
+.local/share/vmmctl/delete.d/  !?!?!
+.local/share/vmmctl/create.d/xdg-desktop-entry.sh		# creates the xdg desktop entry
+
+
+
+
+
+.local/share/vmmctl/vmctl.d/create.d/ : profiler scripts to set vm creation parameters
+.local/share/vmmctl/vmctl.d/rc.d/ : symlinks to ../create.d/* and have a defined execution order.
+									TODO :: is the order required? likely not.
+									scripts can be disabledd vi rc.d - not that bad! bit all enabeld require the link!
+									/etc/apache2/ has available and ...
+
+TODO: have these by VMM?
+
+TODO: is there anything else beside the ISO file name to set params?
+
+.local/share/vmmctl/
+.local/share/vmmctl/vmms/
+.local/share/vmmctl/vmms/vbox/functions.sh
+.local/share/vmmctl/vmms/vbox/params.sh
+.local/share/vmmctl/vmms/vbox/params.d/
+.local/share/vmmctl/vmms/qemu/functions.sh
+
+
+i10n:
+.local/share/vmmctl/locale/
+.local/share/vmmctl/locale/de/
+.local/share/vmmctl/locale/de/HOWTO
+.local/share/vmmctl/locale/de/LC_MESSAGES/
+.local/share/vmmctl/locale/de/LC_MESSAGES/vmctl.mo
+.local/share/vmmctl/locale/de/LC_MESSAGES/vmctl.po
+
+
+desktop / file manager integrations:															# shall be part of the source code and repository, not necessarily installed of all systems
+
+.local/share/vmmctl/kde/servicemenus/create-vm-from-iso-vbox.desktop  <-  .local/share/kservices5/ServiceMenus/create-vm-from-iso-vbox.desktop
+.local/share/vmmctl/cinnamon
+.local/share/vmmctl/xfce (Thunar)
+.local/share/vmmctl/gnome/
+.local/share/vmmctl/xdg/																			all of vmmctl.d/templates/
+
+
+TODO: are my .desktop files generic? so they work woth different file managers? Dolphin, Thunar, Files? if so, the templates shall reside in a common xdg(?) directory
+
+
+working directories:
+/tmp/																							? something like a local HOME based tmp?
+
+.config/menus/applications-merged/
+.local/share/desktop-directories
+.local/share/applications/
+
+
+function templates:
+_args_optional() { v=${1:-one}; printf '%s\n' "${v}"; }
+_args_variable() { local argv=(); loop over "$@" and add to argv[]}
+(all internal functions should start with an underscore)?
+
+test patterns:
+switch=true
+if $switch; then ... ; fi
+$switch && ...
+$switch || ...
+
+
+vm settings / parameters:
+vm_...  generics as disk or memory size
+vbox_...  virtualbox specific
+qemu_...  qemu specific
+xdg_...  freedesktop.org stuff

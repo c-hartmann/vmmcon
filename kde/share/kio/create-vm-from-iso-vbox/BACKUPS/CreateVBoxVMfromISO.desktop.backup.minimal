@@ -1,0 +1,34 @@
+[Desktop Entry]
+Version=1.1
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/x-cd-image;
+Icon=search
+Actions=CreateVBoxVMfromISO_Debian;CreateVBoxVMfromISO_Ubuntu;CreateVBoxVMfromISO_Other;CreateVBoxVMfromISO_Wine;
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-StartupNotify=false
+X-KDE-Priority=TopLevel
+X-KDE-Submenu=Create Virtual Machine
+X-KDE-Submenu[en]=Create virtual machine
+X-KDE-Submenu[de]=Erzeuge virtuelle Maschine
+
+[Desktop Action CreateVBoxVMfromISO_Debian]
+Name=Debian Linux
+#Icon=debian
+Exec=$HOME/.local/share/kservices5/ServiceMenus/CreateVBoxVMfromISO.sh -t debian %f
+
+[Desktop Action CreateVBoxVMfromISO_Ubuntu]
+Name=Ubuntu Linux
+#Icon=ubuntu
+Exec=$HOME/.local/share/kservices5/ServiceMenus/CreateVBoxVMfromISO.sh -t ubuntu %f
+
+[Desktop Action CreateVBoxVMfromISO_Other]
+Name=Other Linux
+#Icon=linux
+Exec=$HOME/.local/share/kservices5/ServiceMenus/CreateVBoxVMfromISO.sh -t linux %f
+
+[Desktop Action CreateVBoxVMfromISO_Wine]
+Name=Wine Linux
+#Icon=wine
+#Icon=/home/christian/.local/share/kservices5/ServiceMenus/wine.png
+Exec=$HOME/.local/share/kservices5/ServiceMenus/CreateVBoxVMfromISO.sh -a %f

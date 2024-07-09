@@ -1,0 +1,1037 @@
+
+#
+# TODO hypercon (fka as vmmcon)
+#
+
+Evtl. den Teil Profile Selection eliminieren - irgendwie ist das gegen
+die Grundidee dieses Tools. Evtl. sollten auch die Dialoge nicht Teil
+des Tools sein - zumindest nicht die, die z.B. nach einem Namen fragen.
+Den Namen kann das Tool über eine (versteckte) Option liefern (aus dem
+Namen der ISO Datei) und die kann dann in der Desktop Inetgration 
+angezeigt und korrigiert werden. (vmmcon-di-kde, vmmcon-desktop-creator-gnome)
+
+Temporäre Dateien über trap(1) löschen (laschen)
+
+auch bei vornehmlicher Nutzung des Desktop Integration sollte alternativ
+zu k- oder x-dialog oder sonstwas die Nutzung eines Terminals für die
+Dialoge möglich sein. Das sollte über globale (i.e. per User) gesetzte
+Umgebungsbariablen möglich sein. Sind die nicht gesetzt, wird eben wie
+in XDG Tools der Desktop detektiert und das Tool automatisch gewählt.
+in.Zusätzlich müssen natürlich Fallbacks gesetzt sein - mit je nach
+Aufruf Quelle unterschiedlich gesetzten Startpunkten. (In der Reihenfolge
+der Programme)
+
+gui, cli -> tui ! (with dialog(1))
+> eine oder mehrere abstrahierende dialog Funtionen
+
+hopper als Name könnte sich auf den Maler Edward Hopper beziehen. Macht es aber
+schwieriger danach zu suchen.
+
+virsh kennt einen interaktiven Modus ... mmm, sollte hypercon das auch haben?
+mit Blick auf das Erzeugen einer neuen VM liegt das nicht sehr fern.
+https://www.youtube.com/watch?v=XLETE7hqbWc
+
+virsh list zeigt nur laufende Maschinen an. Erst mit der Option --all zeigt
+es alle. Sollte hypercon das auch so handhaben? (Search könnte sich derart auch
+besser (von list) differenzieren.
+
+neben vbox und qemu kann man natürlich auch virsh oder virinstall nutzen. Oder 
+beides? der richtige Oberbegriff wäre zweifelsfrei: 'libvirt'. ('virtualbox' sollte
+als Langform von vbox erlaubt sein
+
+KDE users are used to 'autodetect' (from extracting archives with Ark). might be used
+instead of 'automagically'
+
+some functions, such as list should not require a given hypervisor. instead
+these should react an all defined hyper visors.
+
+nproc: display the amount of CPU on the server. usefull?
+
+Server like VMs shall not have any sound devices and such.
+
+'reset' currently refuse to power off a running VM. Shall we allow this "forced"?
+
+vmmcon set|modify <VM> vm_cpu_count=2 vm_memory_size=4096
+- VBoxManage modifyvm OracleLinux6Test --cpus 2 --memory 4096
+
+ein Makefile? für's bauen (mit m4) sowieso und evtl. auch fürs installieren (make install)
+wenn mit sudo, dann systemweit (/usr/local/bin, check PATH beforehand) oder persönlich nach
+~/.local/bin)
+
+dialog function that capsules all options for that including GNOME
+
+some nice ideas on bashing:
+https://github.com/xwmx/bash-boilerplate/
+https://github.com/xwmx/vbox
+
+ich sollte eine Optionen / Parameter Vertrags-Routine haben. is_valid() oder
+so. proof_param()?. den Paramter selber und einen regulären Ausdruck? grep -E
+könnte den Auswerten. echo "$param" | grep -E "$regexp". aaaber .. diese Funktion
+muss IHRE Parameter auch testen. Zumindest auf not_empty. Test auf Type macht
+keinen Sonn, oder? 1 und "1" ist für bash das gleiche.
+> contract()
+
+statt create-desktop-entry evtl. einfacheres create-application
+
+list sollte die Option --state bekommen. dann zeigt es auch den Status an
+(incus list al Vorbild)
+
+list sollte mit globs oder auch regexp umgehen können. Den Unterschied zu 
+search besser heraus arbeiten
+
+Die Alias Kommandos über ein Array in RC definieren?
+Und dieses Array (key/value) als Teil von valid Commands auswerten
+
+OpenVZ Command Line commands:
+zctl create VEID [--ostemplate <name>] [--config <name>]
+    Dieser Befehl erzeugt ein neues VE, das eine numerische ID, ein angegebenes OS-Template (eine Linux-Distribution) und die Ressourcen, die in der angegebenen Konfigurationsdatei spezifiziert sind, hat. Die beiden Parameter --ostemplate und --config sind optional. Die Hauptkonfigurationsdatei enthält Standardwerte für beide.
+vzctl start VEID
+    Startet das angegebene VE. Das Starten bedeutet das Erzeugen eines Virtual Environment im Kernel, Initialisieren von allen Ressourcenverwaltungsparametern und Starten des VEs /sbin/init in diesem Umfeld.
+vzctl stop VEID
+    Stoppt das angegebene VE. Ein VE kann auch mit Hilfe von eigenen /sbin/halt oder /sbin/reboot -Befehlen gestoppt oder neu gestartet werden.
+vzctl exec VEID <command>
+    Startet den Befehl <command> im angegebenen VE. Um beispielsweise alle Prozesse im VE 102 anzeigen zu lassen, kann man vzctl exec 102 ps ax nutzen.
+vzctl enter VEID
+    Öffnet die VE-Shell. Das ist nützlich, wenn z. B. sshd nicht gestartet ist und das Problem untersucht werden soll.
+vzctl set VEID --parameter <value> […] [--save]
+
+
+Der Univention Corporate Server hat (vermutlichauch auf der Konsole) ein License Agreement. Damit kommt vmmcon nicht klar
+-h, --help, -v, --version funktionieren nicht. Sollten sie aber
+
+beim Refactoring von Anfang an auf i18n achten. Wenigstens Deutsch, Englisch
+
+Kdialoge tragen teilweise das VBox Icon. Da muss sich anpassen können
+
+see:
+https://github.com/archlinux/arch-install-scripts/blob/master/arch-chroot.in
+and the Makefile
+on how to create shell scripts (with common) parts from *.in files
+
+vmms/functions.sh might also been seen as "backends", 
+such as kde partition manager has
+
+vmmcon::create_new_vm_from_iso könnte einen automatischen Prüfsummen Check
+bekommen, wenn eine entsprechende Datei mit gleichem Namen aber .chksum Endung
+exitiert.
+Die Bashhat da einen netten Ersetzmechanismus, der mehrere Endungen als mögliche
+Endungen erlaubt und den erstbesten Treffer zurücl liefert.
+Etwa so: <iso-file-basenaem>.{chksum|checksum|...}
+
+interne funktionen haben derzeit das Namenschema _....
+Vielleicht, um sie z.B. besser von Variablen mit dem gleichen Namenschema
+zu differenzieren, stattdessen mit einem Pseudo Klassenschema benennen?
+also z.B. vmmcon::...
+das macht vielleicht vor allem dann einen Sinn, wenn die Top-Level "Funktionen",
+qiw das Anlegen einer neuen VM in Funktionen gepackt wird und nicht mehr in der
+Kommando Auswertung integriert ist:
+vmmcon::create_new_vm_from_iso
+
+Naming again.--
+wenn: pkcon - PackageKit console client
+dann: hvcon - HyperVisor console client
+
+all die Idee hier sollten in ein "Ticket" System.. github?
+
+statt create-desktop-entry vielleicht nur ein 'desktop' command, das (by default
+oder explizit --add) einen Eintrag hinzufügt oder mit --remove / --delete einen 
+solchen Eintrag wieder entfernt. 'xdg-desktop' ist ein erklärender Alias
+(indistrobox ist das eine export, aber das geht gar  nicht)
+
+macht ein Shell modus Sinn? also ein Aufruf ohne Kommandos.
+while read command_line; do
+    ...
+done
+
+kann man via vboxmanage auch tastatur kombinationen oder ACPI events schicken?
+vmmcon send ...
+
+Should HPC be ready for system wide instalation? see the DBX config files:
+config_files="
+	${nix_config_file}
+	/usr/share/distrobox/distrobox.conf
+	/usr/share/defaults/distrobox/distrobox.conf
+	/usr/etc/distrobox/distrobox.conf
+	/usr/local/share/distrobox/distrobox.conf
+	/etc/distrobox/distrobox.conf
+	${XDG_CONFIG_HOME:-"${HOME}/.config"}/distrobox/distrobox.conf
+	${HOME}/.distroboxrc
+"
+
+--desktop=false should disable the creation of the desktop integration
+
+HPC_ is a common prefix for own env variables (HY is for HyPerCon)
+WARNING: HPC might be already used by some hewlett packard product
+⚠️
+�
+✍
+📎
+🔧
+🕸
+🖓
+🖑
+🗑
+🗪
+🗲
+❝❞
+➊➋➌➍➎➏➐➑➒➓
+➀➁➂➃➄➅➆➇➈➉
+⚐⚑
+⛑
+
+distrobox ist auch "nur" ein Satz an (Bourne) SHell Skripten:
+https://github.com/89luca89/distrobox
+
+distrobox comes with a bash (and zsh) completion set:
+https://github.com/89luca89/distrobox/blob/main/completions/bash/distrobox
+
+sollte ich ein 'poweroff' Kommando haben? (das könnte auch 'stop' heißen, dann braucht es ein 'save' dafür)
+> ja, aber 'stopÄ' bleibt stop, weil das andere auch so nennen
+
+exec könnte vtl. auch vboxmanage guestcontrol --exe=... nutzen
+https://www.virtualbox.org/manual/ch08.html#vboxmanage-guestcontrol
+
+https://github.com/xwmx/vbox
+
+'open' könnte(!) alle Protokolle / Regeln in einer priorisierten
+Reihenfolge probieren.
+Oder einen Schalter nutzen: --ssh, --https, --http
+'ssh' und/oder 'login' sind dann quasi Shortcuts / Aliase
+entsprechend könnten auch 'http' und 'https' existieren
+
+wenn ich ssh habe/kann, kann ich auch exec implementieren?
+see:
+https://stackoverflow.com/questions/18502945/how-to-execute-a-remote-command-over-ssh-with-arguments
+> sieht gut aus
+
+ssh und http Regeln auch für bereits existierende VMs möglich machen.
+(kann ein verstecktes Feature sein)
+
+pause und resume Commands
+
+suspend statt savestate?
+
+incus kennt: $ incus launch (to launch a container)
+To start your first container, try: 
+$ incus launch images:ubuntu/22.04
+> wie sieht das bei docker aus?
+>> launch wie Schiffs-Stapellauf? ja!
+>>> das Web UI von Incus hingegen creates instances. aaaja
+>>>> und das auch noch u.a. auf Basis von ISO images
+> incus kennt auch: info <name> und start <name>
+<< dann ist launch wohl doch besser ein alias von create oder umgekehrt!
+> incus kennt auch: stop <name> und delete <name>, auch snapshot <name>
+
+cpu_cores statt cpu_count?
+
+Automatic Profil wieder in GUI Version aktivieren
+
+Remote Login (ssh) für die VMs. 
+Wie kommt man an die IP Nummer?
+Ist die Aktivierung nur VM intern? (ssh Service)
+Braucht es dafür einen anderen Netzwerkmodus als NAT?
+https://bobcares.com/blog/virtualbox-ssh-nat/
+> NAT is okay. Das Zauberwort ist Port-Forwarding
+
+Einen "Set" an eigenen XDG Werkzeugen, die KDE spezifisches
+rausnimmt, wie z.B. für readdocs. (kioclient)
+
+VBox kann auch über das GUI Menü eine VM hart ausschalten.
+Soll ich diese Optionen für alle erzeugten VMs setzen?
+
+Definitiv umsteigen auf einen Build Prozess mit .in Dateien.
+
+Doch hypercon? (einfach weil es sich viel besser ausspricht)
+see: http://www.diva-portal.org/smash/get/diva2:829210/FULLTEXT01.pdf
+> A hypervisor, also called virtual machine manager (VMM)
+vmmcon also might have spelling issues (omitting a 'm' when typing)
+hypercon might be abbreaviated to hcon or even hc in an alias
+see: https://linuxconfig.org/qemu-vs-kvm-hypervisor-whats-the-difference
+> QEMU is short for Quick EMUlator. As its name implies, it can be used
+  as an emulator, but also as a hypervisor
+see: https://en.wikipedia.org/wiki/Hypervisor
+> A hypervisor, also known as a virtual machine monitor (VMM) or virtualizer
+note: Xen is also a hypervisor. 
+see: https://en.wikipedia.org/wiki/Xen
+> Virtual machine monitors (also known as hypervisors)
+
+Kommando Struktur an die von Docker anlehnen? (vmmcon vm(s) list
+statt vmmcon list (vms))
+da sich praktisch alle Operationen auf VMs beziehen - im Gegensatz zu 
+Docker (!?) - scheint mir das keinen Sinn zu machen.
+
+Überhaupt könnte eine Ausrichtung auf "Batch" Operationen (also
+Operationen auf mehrere VMs ein Alleinstellungsmerkmal sein)
+Also z.B. alle (vmm=VBox) VMs auf vm_cpu_count=1 umstellen.
+vmm=vbox muss dabei wie ein Filter wirken. Und vmmcon muss 
+erkennen können, welchen VMM eine VM nutzt. Das erfordert eine
+Überarbeitung des Ladecodes von functions.sh
+function detect_vmm() { ... }
+
+habe ich einen Parameter, um zu steuern, ob die Platte eine normale
+variable ist oder eine fixed Größe?
+
+Diabling nested paging: Gerüchte sagen, dass es die VMs langsam macht.
+(https://forums.virtualbox.org/viewtopic.php?t=106861)
+(https://docs.oracle.com/en/virtualization/virtualbox/6.0/admin/nestedpaging.html)
+function has_ept() { LANG=C lscpu | grep -E '^Flags:' | grep -i ept } # intel
+function has_rvi() { LANG=C lscpu | grep -E '^Flags:' | grep -i rvi } # amd
+function has_vpid() { LANG=C lscpu | grep -E '^Flags:' | grep -i vpid } # intel
+nested paging comes with:
+If nested paging is enabled, the Oracle VM VirtualBox hypervisor can also use 
+large pages to reduce TLB usage and overhead. This can yield a performance 
+improvement of up to 5%. To enable this feature for a VM, you use the VBoxManage 
+modifyvm --large-pages command.
+
+list comman shall have option "by state". say: list all VMs in 'saved' state:
+vmmcon list --state=saved
+Das nich einfach. vboxmanage list --long liefert zwar die Info, aber nicht
+auf einer Zeile. Idee: Zeilenweise einlesen und auf Name: bzw. State: am
+Anfang der Zeile testen.
+.local/bin/vmmcon-list-by-state
+
+https://github.com/erikh/emu
+
+replace '...' with single character / DONE
+
+default STAMP should ne *not* divided from iso name based vm name
+baad: vm (<date>)
+good: vm-<date>
+as this is way easier to select with the mouse in a console window
+
+naming:
+$ pkcon [OPTION …] PackageKit Console Program
+
+code refactoring für vbox und qemu parallel umsetzen! 
+may libvirt as well. in keinem Fall aber darf die neue Implementierung
+vbox orientiert sein!
+
+Sollte die maximal automatische Variante die oberste im Kontext-Menü sein?
+
+Gruppen auch im Desktop Menü? Wenn denn, dann optional. 
+Auto-Gruppierung? Das bräuchte ein lokales Mapping von
+matches auf Gruppen.
+
+systemproperties
+$ VBoxManage list systemproperties
+>z.B: 
+>> Default machine folder:          /home/christian/.VirtualBox/VMs
+>> Maximum video RAM size:          256 Megabytes (TODO: doch darauf beschränken? kann ein Client das anzeigen)
+>> Maximum guest CPU count:         64
+
+# CPU Profile (in VBox) für ältere Distros
+$ VBoxManage list cpu-profiles
+> z.B.: #15: Intel 80386 [x86]
+
+Kann ich readarray irgendwo einsetzen? (tu ich sogar schon)
+https://www.baeldung.com/linux/reading-output-into-array
+evtl. kann run_command davon profitieren und aus den 
+Argumenten ein Array machen
+
+Ein Template für die Konfiguration? vmmcon.sh schaut nach der Konfig
+und installiert aus dem Template, wenn es keine gibt.
+
+Move vmmconrc to $XDG_CONFIG_HOME/vmmcon/vmmcon[rc|.conf]
+
+Eine *.conf Konfiguration statt *rc? Eine mit Doppelpunkten? oder JSON?
+Gelesen von einer Routine, die alle Kommentare und Leerzeilen entfernt
+und in Bash kompatible Syntax übersetzt. Die könnte auch Werte wie
+1, True, TRUE, yes, on, off in "echtes" true übersetzen. Leerzeichen
+im Key könnten auch gelöscht werden.
+> php.ini kennt verschiedene Werte für on/off, oder?
+>> ja, aber meine (teils spez. Konfig für VBox) 
+   will genau DIE Werte: on, off etc. Also: übersetzten is nich!
+see: https://theboreddev.com/understanding-linux-namespaces/  for something similar in JSON
+
+mein eigener Style guide (e.g. fixed names always in single quotes (''))
+https://google.github.io/styleguide/shellguide.html
+> flags wie yes und auto (wie bei Google) in upper cases? > YES und AUTO?
+>> optisch sicher besser! nach dem Setzen auf readonly setzen? aber wann?
+>> Konfiguration und internes Flag können getrennt werden! 
+>> AUTO=$default['auto']
+>> AUTO=$configs['auto']
+>> AUTO=$options['auto'] (if set)
+
+User-Centered Design (help is an option and a command as well)
+Commands should be design based on how a user will interact with the system and not how the system’s backend is organized. While database structures and APIs may define what is possible, they often do not define good user experience; consider user goals and the way in which users will want to interact with their data, then design for these work flows and mold the interface to the user, not the user to the interface.
+Commands should be discoverable via the interface itself.
+To determine a list of available commands, use the ``-h`` or ``--help`` options:
+ $ openstack --help
+For help with an individual command, use the ``help`` command:
+ $ openstack help server create
+
+# start code with initial help detection?
+if [ "$1" = "-h" -o "$1" = "--help" ]; then
+	echo "Usage: nvidia-detect [PCIID]..."
+	echo "       Reports the Debian packages supporting the NVIDIA GPU that is"
+	echo "       installed on the local system (or given as a PCIID parameter)."
+	exit 0
+fi
+# Help texts in distinct $LANG organized directories?
+
+# add a test on real bash:
+shopt -s compat31 nocasematch 2>/dev/null || { echo "Error: this script only works with bash." && exit; } # Avoid cryptic failure when running dash on this script 
+
+(both from: https://salsa.debian.org/nvidia-team/nvidia-graphics-drivers/-/blob/master/debian/detect/nvidia-detect.in)
+
+# batch modifications?
+# e.g.: change mouse pointer integration for n vms
+
+# lokale profile ....
+# sollten eindeutige keys haben und **nicht** die globalen überschreiben!
+# damit entfällt auch die Notwendigkeit eines extras Verzeichnisses.
+# obendrein erlaubt es die Auswahl zwischen globalen und lokalem Profil,
+# das evtl. nur eine kleine Modifikation des globalen darstellt, wie
+# z.B. meine openSUSE config mit UEFI - der angezeigte Name sollte das
+# reflektieren!
+# und durch den Wegfall des extra Verzeichnis wird der Code einfacher
+# und dadurch sicherer.
+
+# maybe .. the CLI version should not be interactive !?
+# i.e.:
+# do not ask for names if not given, just use the default
+# do not ask for profile name if not given, exit if not auto explicitly is given (or should auto be a default?) (this looks like a conflict with the gui version)
+# if there is no interactive selection of a profile, there shall be a command to list them (this might end up with a new list command, that takes a subcommand, such as vms or profiles)
+
+# Nested VT soll kein default sein. Das ist nun wirklich ein sehr spezieller Fall
+
+# Maus fangen oder nicht sollte Teil des Profils sein: weil Linux Desktops "hot corners" haben die ohne
+# fangen der Maus nicht nutzbar sind.
+
+# find a better icon for the file manager view of ~/.local/share/applications/vmmcon
+# colorfull but also symbolic
+# preferences-system-login (spots a monitor with login screen in)
+# preferences-system-startup (spots a monitor with linux boot screen)
+# computer (spots a monitor (spots a monitor with a running kde desktop)
+
+# icon für .desktop file
+vm-desktop-file-icon=computer-symbolic # preferences-system-startup, preferences-system-login, computer
+
+# INFO / DEBUG LEVEL:
+# default:1 (Willkommenszeile, internal, external commands)
+# 0: gar keine Infos
+# 2: mehr infos
+
+# nice line:
+# declare CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/bashmount/config"
+
+# the application shall open a (k)dialog which some more options than just "do it". this
+# might be one DE specific.
+
+# maybe another renaming to: "hopper" (the distro hoppers workhorse)
+
+# VMM might be renamed to "Provider". VirtBox, QEMU and libvirt are not equal enough, and basicly
+# QEMU *is* the underlying VMM for libvirt. If we call this provider, there is some abstraction,
+# that leverages this disctinction between qemu and libvirt.
+
+# configs should be an (internal) array, wherein config, environment and command line options go into
+
+# kann Bash hierarchische Arrays? (like: configs[General][AutoCpuCoreDivider]?)
+
+# Personal Configuration
+# is automagic.X something to share or something to configure?
+# ~/.local/share/vmmcon/automagic.json ? or:
+# ~/.config/vmmcon/automagic.json ?
+# https://rabbitictranslator.com/kconfig/
+# currently there is only:
+# ~/.config/vmmconrc (okay, as it is a shell evaluated script) (or not okay, as it does *not* run commands, it could even get parsed by python or different) > rc -> .conf ?
+# ~/.config/vmmcon/vmmconrc (should be this, if we go for a config directory)
+# rc is for run control:  it controls the running of the comamnd. as most of the values can be overruled by command line arguments, this rc is the right naming!
+# there is probably a better name for the automagic stuff:
+# vmdefaults.json, configs.json, setup.json, auto-setups.json, config-setups.json ? (any need to mention vm in the name? this is THE thing about it!) (do we need to separate configs (vm stuff) and setups (vm and user stuff, where the unattended method refers to the "installer"!)?)
+# give a fuck on setup v. installation and name the think unattended.json?
+# it requires the option to start with a specific set of setup defaults with
+# a --config option (or a --defaults option?)
+# and the file name should reflect that.
+# some rc values can go into the setup defaults, such as: cores=[1,2,4,6,8,...,auto], but the "divider" the auto config is based on, can stay in rc
+the absence of a value triggers auto, or zero is auto
+# as of the XDG specs, .config/ is the user specific variant of /etc/
+# as we (currently) do not have /etc, we have to "simulate" that one in .local/share/ (?)
+# if we look into /etc/ssl/certs/, we will find a lot of symlinks into /usr/share/certificates (this is the way!)
+# if we imagine a /etc/vmmcon/ directory, these might link to /usr/share/vmmcon/ (such as /usr/share/qemu/ is)
+
+
+
+# Desktop Integration 1
+# den Datumszusatz in Klammern durch ein einleitendes _ ersetzen.
+# (Vorteil: Selection on Command line, Beschreibung - wenn aktiv anzeigen in Launchern - wird auch in Klammern dargestellt)
+
+# Desktop Integration 2
+# Virtual Machines umbenennen in Virtual Appliances?
+# (auf ne Art sind VMs auch "nur" aplliances, aber vor allem wäre es viel
+# passender für "windowed" VMS, bei denen nur eine Anwendung (Office) später
+# auf dem Desktop zu sehen ist.
+
+
+
+# list und query sollten das gleiche sein. list mit arguemnten halt wie query (DONE)
+
+# kann man einen gesicherten Status verwerfen ('Discard') und damit neu booten?
+# z.B. wenn die VM abgestürzt ist ... dann wäre erst starten und
+# dann interaktiv ausschalten einfach nicht effektiv.
+# VBoxManage discardstate -> vmmcon discard <VM>, vmmcon start --discard <VM>
+> extra Kommando ist besser - wer sagt, dass man zwingend neu starten will.
+# oder einfach beides implementieren? :)
+
+# da is noch mehr spannendes ..
+# VBoxManage controlvm <VM> reset  (same as pressing the reset button)
+# VBoxManage controlvm <VM> savestate  (save the current state and stop the VM)
+> warum ist dann discardstate ein eigenes Kommando !?!? nicht konsistent, oder?
+> auch wenn sich controlvm offenkundig nur auf laufende VMs bezieht.
+
+
+# use proper exit codes:
+# https://www.cyberciti.biz/faq/linux-bash-exit-status-set-exit-statusin-bash/
+# https://itsfoss.com/linux-exit-codes/
+
+
+# see: nproc(1)
+# $ nproc
+# > 4
+# use this to determine the number of cores in a new VM?
+# > there might be an equivalent in the /proc filesystem
+
+
+### TODO : get true/false v. 0/1 consistent throughout this script
+###        simple intuitive configuration outperforms niceclean code
+###        create_stamp, create_desktop_menu_entry, create_desktop_menu_entry_native_command
+
+
+# die Idee in QuickEMU ist, eine neue VM über eine (eigene) Konfiguration zu erzeugen.
+# So dumm ist die Idee nicht. Warum eigentlich nicht (auch) so!? So könnte man sich eine
+# Hyper-Konfi anlegen, und praktish alle neune VM mit erzeugen oder zumindest einige mit
+# identischen Settings. Dann kann man die z.B. prima vergleichen.
+# > --config|--profile (choose a specific config, so no ISO matching will take place, but other configs apply, if not overrules by the named config)
+# > --no-auto (disables any auto configuration. usefull when used with --config)
+# :) hab ich längst!
+
+# pay respect to defaults as in:
+#    <SystemProperties defaultMachineFolder="/home/christian/.VirtualBox/VMs" defaultHardDiskFormat="VDI" VRDEAuthLibrary="VBoxAuth" webServiceAuthLibrary="VBoxAuth" LogHistoryCount="3" proxyMode="0" exclusiveHwVirt="true"/>
+
+# get KDE dependencies out, sucha s kioclient (for opening browser)
+
+# allow JSON as config language for default settings? jq(1)?
+# alternatives to jq?
+
+# rename and clone command shall behave the same way. i.e. both shall treat
+# the second argument as optional and - if not present - shall ask for it
+
+# https://www.redhat.com/sysadmin/bash-error-handling
+
+# --auto-magic to --auto ?! (good enough and easier to remember)
+
+# shall we allow upgrades?
+# all upgrades files might get a filename extension taken from LATEST
+
+# Sollte vmmcon wie WSL Distros kennen und zur Installation anbieten?
+# mit Kurznamen (wie Ubuntu) und Verweisen auf Versionen. Wo kommt die
+# Liste her? Off- oder Online? Update (nur) der Liste anbieten? install --update
+
+# nach einem Download eines ISO Images möchte Firefox(?) die Datei mit Ark
+# öffnen, oder einer anderenAnwendung. NUr "Create VM from It" ist leider
+# nicht dabei, weil es wohl nicht als solche "definiert" ist. Wie kommen
+# wir da mit rein? Kann man eine solche irgendwo in ~/.local definieren?
+> .local/share/applications/create-vm-from-iso.desktop
+
+# automagic.csv könnte man auch funktional runter brechen auf iconmap.csv, die
+# von einem entsprechenden Filter Skript ausgelesen wird. (autoconfig.d/10_iconmap.sh)
+
+? Wie kann ich Updates des Basisskripts verteilen?
+? als Flatpak?
+> nö, blöde Idee
+! aber Git
+
+# ein GitHub Service Menu? "Add Remote", "Sync with Remote", "?"
+
+# SendFile with KDE Connect? Reasonable other Actions?
+> Problemn dabei: wo kommt die Liste meiner Geräte her und
+> wie kommmt sie in's Menü?
+* Eine Update this list Option? Und dann?
+? Gibt es ein Include für Desktop Dateien?
+* Oder ... die Desktop Datei wird einem frisch generiertem "Anhang" / "Vorlauf"
+* im $EDITOR geöffnet, angepasst und gespeichert. Das ist gar nicht so doof,
+* z.B. wenn ein User zwei Geräte der selben Art hat.
+# Hat KDE Connect überhaupt einen Konsolen Modus?
+> https://manpages.ubuntu.com/manpages/bionic/man1/kdeconnect-cli.1.html
+> https://linuxcommandlibrary.com/man/kdeconnect-cli
+$ kdeconnect-cli --list-devices   [--id-name-only]
+$ kdeconnect-cli --list-available [--id-name-only]
+* Oder die Auswahl erfolgt erst in einem Dialog. Nicht schön, aber tut.
+$ kdeconnect-cli --share <path> --device <device>
+? welche Optionen gibt es eigentlich, das GUI eines Telefons am PC
+? anzuzeigen und zu bedienen?
+
+# das KDE ServiceMenu sollte ohne vmmctl|vmmcon daher kommen, ABER
+# dieses - so es nicht im Pfad gefunden wird (via loacte, type, oder
+# "zu Fuß) - aus (m)einem Github Repo nachinstllieren.
+# Dazu gehört auch eine GUI Fehlermeldung, wenn es am Ende doch
+# nicht installiert ist.
+? auch eine Option zum Installieren? Aus dem Dialog heraus?
+# und dazu hätte es gerne ein kleines Zusatzskript, das seinerseits
+# wiederum Teil des Desktop Pakets sein kann - schon weil es nur
+# darin einen Sinn ergibt.
+
+# vmmcon instead of vmmctl?  con refers to con|sole and con|trol as well
+
+# Kann jedes Kommando seine eigene Plugin-ähnliche Dateistruktur haben?
+# Also sowohl die Definitionen für Optionen als auch den Code?
+# SOPT='h'
+# LOPT='--help'
+
+# disk and maybe memory sizes might / should depend on usage: server or desktop
+? But how to detect from ISO name?
+# skripted multi step filters might come handy with that
+
+# shall we allow "shorts" of commands, such as ip(1) does?:
+  sudo ip addr flush dev {networkDeviceNameHere}
+  sudo ip addr flush dev eth1
+
+# we might also allow incomplete VM names. this is close to the query command.
+  if this has just one match, we start matching VM...
+
+VM snap command
+
+# vielleihct sollten die applications doch in ein eigenes Verzeichnis? So wie für wine?
+  das ist schon deswegen die bessere Lösung, weil die Namen denen der VMs entsprechen.
+  aber ist ds konform? macht das XDG Werkzeug da mit?
+
+ ➜ ll ~/.local/share/applications/
+insgesamt 264
+drwxrwxr-x 3 christian christian  4096 Apr  6  2022 wine
+drwxrwxr-x 3 christian christian  4096 Apr  6  2022 org.vmmctl.vm
+drwxrwxr-x 3 christian christian  4096 Apr  6  2022 org.vmmcon.vm
+-rw------- 1 christian christian   460 Feb 20 05:04 org.vmmcon.vm/archlinux-2023_02_01-x86_64_2023-02-20.desktop
+-rw------- 1 christian christian   464 Mär  1 10:27 org.vmmcon.vm/bitnami-joomla-4_2_8-0-debian_2023-03-01.desktop
+-rw------- 1 christian christian   512 Mär  1 10:17 org.vmmcon.vm/bitnami-joomla-4_2_8-0-linux-vm-debian-11-x86_64-nami_2023-03-01.desktop
+-rw------- 1 christian christian   408 Feb 28 12:45 org.vmmcon.vm/bitnami-joomla.desktop
+-rw------- 1 christian christian   454 Feb 23 08:50 org.vmmcon.vm/cachyos-kde-linux-230206_2023-02-23.desktop
+-rw------- 1 christian christian   454 Apr 23  2022 org.vmmcon.vm/cbpp-11.1-amd64-20210923_2022-04-19.desktop
+-rw------- 1 christian christian   462 Apr 25  2022 org.vmmcon.vm/chakra-2017.10-goedel-x86_64_2022-04-25.desktop
+-rw------- 1 christian christian   428 Jul 13  2022 org.vmmcon.vm/Debian_11_Bullseye_KDE.desktop
+-rw------- 1 christian christian   486 Nov 25 10:37 org.vmmcon.vm/devuan_chimaera_4_0_2_amd64_desktop-live_2022-11-25.desktop
+-rw------- 1 christian christian   474 Feb  3 10:44 org.vmmcon.vm/elementaryos-7_0-stable_20230129rc_2023-02-03.desktop
+-rw------- 1 christian christian   464 Feb 27 13:45 org.vmmcon.vm/Fedora-KDE-Live-x86_64-37-1_7_2023-02-27.desktop
+-rw------- 1 christian christian   460 Jan 25 12:30 org.vmmcon.vm/Feren-OS-standarddt-2023_01_2023-01-25.desktop
+-rw------- 1 christian christian   474 Apr 25  2022 org.vmmctl.vm/garuda-dr460nized-linux-zen-220329_2022-04-25.desktop
+-rw------- 1 christian christian   444 Okt 31 12:13 org.vmmctl.vm/KaOS-2022_10-x86_64_2022-10-31.desktop
+-rw------- 1 christian christian   412 Jul 14  2022 org.vmmctl.vm/KDE_neon_2021-12.desktop
+-rw------- 1 christian christian   460 Apr 23  2022 org.vmmctl.vm/kubuntu-22.04-desktop-amd64_2022-04-22.desktop
+-rw------- 1 christian christian   456 Jun  7  2022 org.vmmctl.vm/kubuntu-22_04-desktop-amd64_bartmann.desktop
+-rw------- 1 christian christian   464 Jan  4 12:45 org.vmmctl.vm/linuxmint-21_1-cinnamon-64bit_2023-01-04.desktop
+-rw------- 1 christian christian   450 Apr 25  2022 org.vmmctl.vm/lithium-3-amd64.hybrid_2022-04-25.desktop
+-rw------- 1 christian christian   448 Apr 19  2022 org.vmmctl.vm/lmde-4-cinnamon-64bit_2022-03-19.desktop
+-rw------- 1 christian christian   448 Apr 23  2022 org.vmmctl.vm/lmde-5-cinnamon-64bit_2022-04-09.desktop
+-rw------- 1 christian christian   438 Apr 28  2022 org.vmmctl.vm/maui-17.06-64bit_2022-04-28.desktop
+-rw------- 1 christian christian   458 Mai  7  2022 org.vmmctl.vm/MocaccinoOS-KDE-0.20220424_2022-05-07.desktop
+-rw------- 1 christian christian   458 Apr 24  2022 org.vmmctl.vm/neon-testing-20220419-1822_2022-04-24.desktop
+-rw------- 1 christian christian   452 Feb 25 16:27 org.vmmctl.vm/neon-user-20230214-1145_2023-02-25.desktop
+-rw------- 1 christian christian   462 Apr 23  2022 org.vmmctl.vm/netrunner-desktop-2101-64bit_2022-04-23.desktop
+-rw------- 1 christian christian   470 Jan 16 10:42 org.vmmctl.vm/nitrux-nx-desktop-d5c7cdff-amd64_2023-01-16.desktop
+-rw------- 1 christian christian   442 Jan 15 10:05 org.vmmctl.vm/nitrux-release-amd64_2021_12_27.desktop
+-rw------- 1 christian christian   492 Mai 10  2022 org.vmmctl.vm/nixos-21.11.337422.3c5ae9be1f1-x86_64-linux_2022-05-10.desktop
+-rw------- 1 christian christian   454 Nov 14 08:20 org.vmmctl.vm/Nobara-36-KDE-2022-11-08_2022-11-14.desktop
+-rw------- 1 christian christian   466 Mai 10  2022 org.vmmctl.vm/pearOS-NiceC0re-2022.04-x86_64_2022-05-10.desktop
+-rw------- 1 christian christian   406 Mai 23  2022 org.vmmctl.vm/Pop__OS_21_04.desktop
+-rw------- 1 christian christian   466 Apr 30  2022 org.vmmctl.vm/redhat-7.3-valhalla-i386-disc1_2022-04-30.desktop
+-rw------- 1 christian christian   597 Mai 22  2022 org.vmmctl.vm/redhat-zoot-6.2-i386_2022-04-25.desktop
+-rw------- 1 christian christian   446 Mai 18  2022 org.vmmctl.vm/rhel-8.6-x86_64-boot_2022-05-18.desktop
+-rw------- 1 christian christian   444 Mai 18  2022 org.vmmctl.vm/rhel-8.6-x86_64-dvd_2022-05-18.desktop
+-rw------- 1 christian christian   448 Mai 17  2022 org.vmmctl.vm/Rocky-8.6-x86_64-dvd1_2022-05-17.desktop
+-rw------- 1 christian christian   444 Apr 25  2022 org.vmmctl.vm/SUSE-Linux-5.1-i386_2022-04-25.desktop
+-rw------- 1 christian christian   444 Apr 25  2022 org.vmmctl.vm/SUSE-Linux-5.3-i386_2022-04-25.desktop
+-rw------- 1 christian christian   472 Jan 11 10:15 org.vmmctl.vm/ubuntu-22_04_1-live-server-amd64_IGeL_Backup.desktop
+-rw------- 1 christian christian   480 Jan 11 10:15 org.vmmctl.vm/ubuntu-22_04_1-live-server-amd64_IGeL_Spielwiese.desktop
+-rw------- 1 christian christian   478 Jan  9 12:38 org.vmmctl.vm/ubuntu-22_04_1-live-server-amd64_WordPress_Base.desktop
+-rw------- 1 christian christian   472 Apr 23  2022 org.vmmctl.vm/ubuntu-budgie-22.04-desktop-amd64_2022-04-22.desktop
+-rwxr-xr-x 1 christian christian  1027 Jan 23  2022 telegram-desktop_telegram-desktop.desktop.OFF
+
+# show Error messages on failed startups. Such as:
+  VM Name: bitnami-joomla-4.2.8-0-linux-vm-debian-11-x86_64-nami (2023-03-01)
+  Failed to construct device 'ichac97' instance #0 (VERR_CFGM_NOT_ENOUGH_SPACE).
+  Result Code:
+  NS_ERROR_FAILURE (0X80004005)
+  Component:
+  ConsoleWrap
+  Interface:
+  IConsole {6ac83d89-6ee7-4e33-8ae6-b257b2e81be8}
+
+# TODO use VM name on app import / Auto name?
+> rename VM .. if Desktp Entry exists, update this as well
+
+# TODO check diabling flag in _create_desktop_entry. do we have such a flag?
+
+# new name? vmmctl? just for the command? how does this affects install procedure?
+# is there any defined for service menus made of many files
+
+# super top question on naming
+
+# Integration of unattend installation based on Templates:
+  /usr/share/virtualbox/UnattendedTemplates/
+  -rw-r--r-- 1 root root 11440 Jan 11 18:07 debian_postinstall.sh
+  -rw-r--r-- 1 root root  3331 Jan 11 18:07 debian_preseed.cfg
+  -rw-r--r-- 1 root root  2165 Jan 11 18:07 fedora_ks.cfg
+  -rw-r--r-- 1 root root  2164 Jan 11 18:07 lgw_ks.cfg
+  -rw-r--r-- 1 root root 17596 Jan 11 18:07 lgw_postinstall.sh
+  -rw-r--r-- 1 root root  2680 Jan 11 18:07 ol_ks.cfg
+  -rw-r--r-- 1 root root 12231 Jan 11 18:07 ol_postinstall.sh
+  -rw-r--r-- 1 root root 15582 Jan 11 18:07 os2_cid_install.cmd
+  -rw-r--r-- 1 root root  7574 Jan 11 18:07 os2_response_files.rsp
+  -rw-r--r-- 1 root root  7876 Jan 11 18:07 os2_util.exe
+  -rw-r--r-- 1 root root  2681 Jan 11 18:07 redhat67_ks.cfg
+  -rw-r--r-- 1 root root 11653 Jan 11 18:07 redhat_postinstall.sh
+  -rw-r--r-- 1 root root  3930 Jan 11 18:07 rhel3_ks.cfg
+  -rw-r--r-- 1 root root  3298 Jan 11 18:07 rhel4_ks.cfg
+  -rw-r--r-- 1 root root  3184 Jan 11 18:07 rhel5_ks.cfg
+  -rw-r--r-- 1 root root  4122 Jan 11 18:07 ubuntu_preseed.cfg
+  -rw-r--r-- 1 root root  1859 Jan 11 18:07 win_nt5_unattended.sif
+  -rw-r--r-- 1 root root 14535 Jan 11 18:07 win_nt6_unattended.xml
+  -rw-r--r-- 1 root root  7344 Jan 11 18:07 win_postinstall.cmd
+  controlled via my config files with that key:
+  vbox_unattended_install=true
+
+? vmmctl is the basis thing ... fine, but...
+
+! automatically (QuickEMU)
+> automagically
+
+? the kde service menu package ...
+- should have a shell script named as the package and
+- should have a distinct path to that script
+- although there is nothing against existing this script as a symlink
+> where shall all the shared files go?
+
+? handle multiple VMs with (some?) commands? such as start, or create-desktop-entrie
+
+? shallwe use a [section] style in config, such as /etc/glances/glances.conf ?
+
+? TRAP Ctrl-C?
+
+? Vorbild Archs Pacman:
+- output Zeilen beginnen mit: ==>
+- input Zeilen beginnen mit:  ::
+-- äh, nö, so einfach ist es nicht, aber die Idee ist grundsätzlich gut
+
+Vorbild: Ark:
+Entpacken > Hierher entpacken ..., Unterordner selbstständig ermitteln
+
+* install.sh as part of a github repo, to install without desktop integration
+
+- desktop integration for Mint (Cinnamon), LMDE, XFCE?
+
++ add Comment section in *.desktop files, that shows up on mouse over,
+  telling the user, a click here will start the VM
+> it is there but not showing up :(
+
+? shall we have a --log option (spec. on creating a new VM)
+
+? do created disks have the ability to grow in storage automatically?
+
+? just use ssh(1) (into the freshly created box) to setup user(s)
+> ? is ssh server enabled by default?
+>> NO! generaly not!
+>>> A it is an obvious security issue
+>>>> so we go with either:
+>>>>> the default solutions of vbox and virt-manager (unttended.py)
+>>>>> or we reimplement it outside these defaults
+
+! readdocs command has a KDE dependency
+
+? renaming some command line options ?
+? --auto-profile and --auto-setup-guest / --preseed-installer / --auto-install
+? --auto-config (not profile as ist is about to configure the vm)
+- citing FAI: t's a system to _install_ and _configure_ Linux systems
+> using that, the first step is install: --auto-install, the second is
+  configuration:  --auto-config
+> that's exactly the opposite of my approach so far
+> ? what is configured here? > it's the VM > --auto-config
+>   installation of the OS is second:  --auto-install / --auto-setup
+>   the "installation" is the basic procedure _after_ booting ... this
+> is the thing to automate in an unattended way.
+> Installation is _the_ term widely used for this.
+> Such as FAI uses it, or VBox with "unattended Installation"
+! what realy happens is a mixture of instalation and setup :(
+! the OS is being installed (on disk, configure network etc.)
+! creating users is a setup process,
+- network configuration might also be seen as that
+> ???
+! post-install-script.sh > this is the setup !?
+? so we divide this as well?
+> sounds reasonable!
+> so we would end up with three(!) stages:
+- --auto-config (the vm, derived from OS type, but actualy independet),
+- --auto-install (the OS, definitly OS dependend),
+- --auto-setup (the system. more or less OS independent)
+> :)
+> the WHOLE process is() unattended!
+> we might use the "shortcut" 'create --unattended' to use these three in once
+
+
+? namespace "main" ? main.sh?   main::run_command
+
+? is there something like a preprocessor for bash scripts ?
+
+
+# done, but re-opened
+
+* install into ServiceMenus or alongside
+> into ServiceMenus!
+- see: /usr/share/kservices5/ v. /usr/share/kservices5/ServiceMenus/
+! IF we reduce the clutter of files to two files .. we migth go back to
+  ~/.local/share/kservices5/ServiceMenus/  (i.e. INTO!)
+
+
+
+# not done yet are ...
+
+➜ xdg-user-dir DOWNLOAD
+/home/christian/Downloads
+
+? support desktop shortcuts as well ?
+
+* rename all (vm) config related options to vm_config_...?
+  and accordingly others to vm_setup_...?
+
+* add create option --enable-ssh (via network adapter), use host_ssh_port=2022,2222,3022
+  Port 2222 –> TCP –> DirectAdmin Server Control Panel (unoff.), EtherNet/IP-1 (off.)
+  Port 2022 –> TCP –> down (???)
+  Port 3022 –> TCP –> csregagent (???)
+$ host_ssh_port=2222
+$ vm_ssh_port=22
+$ vm_ip_num=10.0.2.15
+$ localhost=127.0.0.1
+$ VBoxManage modifyvm $VM --natpf1 "SSH,tcp,$localhost,$host_ssh_port,$vm_ip_num,$vm_ssh_port"
+$ VBoxManage modifyvm $VM --natpf1 "ssh,tcp,,$SSHPORT,,22" # muss wohl nicht alles
+
+* test on -f should be -r (as the file shall be readable)
+
+* add 'ssh' (into) command
+* activate SSH by default?
+https://github.com/lencap/vmc/blob/main/src/vmssh.c
+https://man.openbsd.org/vmctl.8 :: --console ?
+
+* all memory and disk sizes should allow the use of a metric(?) such as 1024M
+
+* replace SATA hard disk with IDE for old distributions. which Linux kernel add support for SATA?
+
+* get OVF (!) import ready
+
+* START GIT PROJECT WITH NEW NAME(s)
+
+* Support for .BIN / .CUE files / images (.MDF?)
+- either via converting them:  iat,  ccd2iso, mdf2iso, bchunk
+
+* import and create should have a progress (k)dialog in GUI mode
+
+* remove code doublings from create and import
+
+* _init_vm_cpu_count has VBox specific parts in it ...
+
+* create desktop menu extries for [each] created VM (on the fly, if so configured)
+* create desktop menu extries for existing VMs on request
+- addmenu:
+  add a VM to "my" menu (directory)
+- initmenu:
+  activate .config/menus/menus/applications-merged/virtual-machines.menu (from .disabled)
+  activate (if required) .local/share/desktop-directories/virtual-machines.desktop
+- if this is technically doable, we moight put "vms" into:
+  .local/share/desktop-directories/virtual-machines.d/
+- Tools to use?
+  https://www.systutorials.com/docs/linux/man/1-desktop-file-install/
+
+
+* move code of some options to command section, remove from valid options
+
+* notification with "Start Now" button?
+    # gdbus: way to komplex
+	# gdbus call --session \
+	#     --dest=org.freedesktop.Notifications \
+	#     --object-path=/org/freedesktop/Notifications \
+	#     --method=org.freedesktop.Notifications.Notify \
+	#     "" 0 "" 'Create VBox VM from ISO' "Virtual Machine added:<br>\"<b>$vm_name</b>\" \
+	#     '[]' '{"urgency": <1>}' 5000
+
+	# A notification might be the wrong place to start something up
+	# konnect notifications allow reading on the mobile
+
+	# https://askubuntu.com/questions/726839/how-to-send-kde5-desktop-notification-from-a-bash-script
+	# qdbus org.kde.knotify /Notify event "event" 'app' "(" ")" 'title' 'text' 'pixmap' '' 5 0
+
+
+* kdialog kann --geometry ... wenn wir nicht breit genug sind ..
+
+* CREATE braucht viele kleine Funktionen (VMM specific?)
+
+* Fuzzy search for profiles - with maximum match?  (see ubuntu-kylin)
+  agrep might do the job: https://www.linux-magazine.com/Issues/2016/184/agrep
+  but agrep is a non-default installation
+
+* do not fallback to Linux on no match (profile). Either cancel or ask
+
+* install.sh might get and use parent process id to evaluate, if it is
+  executed directly insoide a terminal or by dolphin or dolphin service
+  menu installer.
+
+* vmmctl list --running . list running VMs only
+? can we make a krunner extension from that?
++ that differentiate between running (go to) and stopped (start)
+- https://store.kde.org/p/1081264/
+- https://store.kde.org/p/1080708/
+
+* -i | --iso | --isofile instead of plain -f | --file ?
+
+* the Exec should have a controlled environment: bash -c '...'
+
+* tests with all the support files disabled .. does it run with defaults?
+
+* rename .d directories inside ME.d directory to names without trailing .d
+
+* use commands for all control operations (including create as default)
+- remove old corresponding long and short options
+
+* new infrastructure VMM based .. (conflicts with todo run without helpers)
+- create a vmm (VMM) switch, that defaults to vbox (about to change later)
+
+* rename to a name without -vbox suffix
+? --vbox als (current default) option
+? KVM installed by default on Linux systems
+- all the specific parts could be in loadable moduls (with nice function names)
+? start with that before publishing?
+- create a basic set of functions, such as _init_ (who said Python here?)
+- the .sktop part could continue with the VBox in name, as users might use two
+  of them in parallel just to compare VBOx with QEmu with KVM
+
+* messages and dialogs should be gettext based
+- create an initial german .. .po, .mo (?) file
+? gettext oder xgettext
+
+* check double square brackets on double quotes usage.
+  they are likely not required
+
+* use the script locator from create-iso-from-disk in .desktop file
+
+* setup git repo and use gitlab as origin. test on Lenni2/think/pad
+
+* make based build script (Makefile) - may be cmake based
+- shall remove all simple comments (#) and reduce all extended
+  comments (###) to simple comments
+
+* enable UEFI for distros that are known for good handling
+  Ubuntu, Debian?, KaOS, ...
+  and .. is this a good idea?
+
+
+
+# done so far
+
+* get OVA import ready
+
+* search local database before global? Done already :)
+
+* get license in
+
+* how does the SCRIPT_DIR trick works with symlinks?
+- would a symlink called create... find it's installation directory?
+> it does! awesome!
+
+* replace all echo with printf?
+- https://www.in-ulm.de/~mascheck/various/echo+printf/
+- https://linuxize.com/post/bash-printf-command/
+> yes
+
+* use #!/usr/bin/env bash ?
+? what is the difference
+? is there a reasonable use or env for bash
+- i do understand for perl, but bash?
+> it's about FHS!
+- https://de.wikipedia.org/wiki/Filesystem_Hierarchy_Standard
+> bash it NOT defined in FHS!
+> but sh is!
+? can we use /bin/sh but act it like bash ("knowing" it IS bash)
+> on KDE neon /bin/sh is a symbolic link to /bin/dash
+- https://stackoverflow.com/questions/21612980/why-is-usr-bin-env-bash-superior-to-bin-bash
+> /bin/bash won't work on OpenBSD
+> for bash it is a bit of overkill and just slows down things
+- BSD like system have /usr/local/bin/bash, but also /usr/bin/env
+? BSD and KDE
+? Solaris
+- https://www.cyberciti.biz/tips/finding-bash-perl-python-portably-using-env.html
+! okay. we use env too
+
+* choose an icon that does comply with desktop icon specification
+
+* cli dialog - either dialog(1) or simnply read based (as a fallback),
+> check zenity zenity is GTK. this is not acceptable
+> dialog is ncurses based and lovely but probably very rarely installed
+> so we use read(1) and hint the userin to dialog
+
+> grapical dialogs might be requested expressively with -g or -x.
+  both not good: global x-only not wayland?
+
++ dynamic video Memory?
++ try to assign 256 MB video memory
+> doable!
+
+
+
+
+
+# long term todos (via branching on/from github)
+
++ cli fancy mode
+
+* VBoxManage createmedium0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+- can we create a progress dialog from this?  is it worth? this is so damned quick ;)
+
++ auto setup (unattended installation)
+
++ kdialog might make use of html tags
+> see: https://scottferguson.com.au/community/FOSS/kdialog.html
+
++ create a debian / fedora / arch / ... package from it
+? can github serve as a repository?
+
++ check how QEMU works and if can intregrate that one as well
+
++ check if gnome has the same extensibility - if, can we comply with that also?
+> FileManager-Actions: https://gitlab.gnome.org/Archive/filemanager-actions
+
++ startup (and other yes/no) dialog(s) should have a timeout.
+  does kdialog have this? > so auf die Schnelle nicht.
+
+
+
+
+$ nvidia-smi
+>>
+Mon Feb 28 09:55:16 2022
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 470.103.01   Driver Version: 470.103.01   CUDA Version: 11.4     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  Off  | 00000000:01:00.0  On |                  N/A |
+| 33%   43C    P0     6W /  38W |   1775MiB /  2000MiB |     15%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|    0   N/A  N/A      1354      G   /usr/lib/xorg/Xorg               1352MiB |
+|    0   N/A  N/A      2050      G   /usr/bin/kwin_x11                  41MiB |
+|    0   N/A  N/A      2532      G   /usr/bin/plasmashell               56MiB |
+|    0   N/A  N/A      3415      G   ...akonadi_archivemail_agent        1MiB |
+|    0   N/A  N/A      3429      G   .../akonadi_mailfilter_agent        1MiB |
+|    0   N/A  N/A      3437      G   ...n/akonadi_sendlater_agent        1MiB |
+|    0   N/A  N/A      3441      G   ...nadi_unifiedmailbox_agent        1MiB |
+|    0   N/A  N/A      8580      G   ...AAAAAAAAA= --shared-files       26MiB |
+|    0   N/A  N/A     10544      G   /usr/lib/firefox/firefox          229MiB |
+|    0   N/A  N/A     10999      G   /usr/lib/firefox/firefox            1MiB |
+|    0   N/A  N/A     11935      G   /usr/lib/firefox/firefox            1MiB |
+|    0   N/A  N/A     17302      G   /usr/bin/krunner                    5MiB |
+|    0   N/A  N/A     32471      G   ...AAAAAAAAA= --shared-files       20MiB |
++-----------------------------------------------------------------------------+

@@ -1,0 +1,86 @@
+Albanisch:[sq]=Krijo një makinë virtuale
+Baskisch:[eu]=Sortu makina birtual bat
+Bulgarisch:[bg]=Създайте виртуална машина
+Belarussisch:[be]=Стварыце віртуальную машыну
+Bosnisch:[bs]=Kreirajte virtuelnu mašinus
+Dänisch:[da]=Opret virtuel maskine
+Deutsch:[de]=Erzeuge eine virtuelle Maschine
+Englisch:[en]=Create a virtual machine
+Estnisch:[et]=Loo virtuaalne masin
+Französisch:[fr]=Créer une machine virtuelle
+Friesisch:[fy]=Meitsje firtuele masine
+Finnisch:[fi]=Luo virtuaalikone
+Griechisch(Google):[el]=Δημιουργία εικονικής μηχανής
+Griechisch[DeepL]:[el]=Δημιουργήστε μια εικονική μηχανή
+Irisch/Gälisch:[ga]=Cruthaigh meaisín fíorúil
+Isländisch:[is]=Búðu til sýndarvél
+Italienisch:[it]=Crea una macchina virtuale
+Katalan(isch):[ca]=Crea una màquina virtual
+Kroatisch:[hr]=Napravite virtualni stroj
+Lateinisch:[la]=Rectum apparatus crea
+Lettisch:[lv]=Izveidojiet virtuālo mašīnu
+Litauisch:[lt]=Sukurkite virtualią mašiną
+Maltesisch:[mt]=Oħloq magna virtwali
+Mazedonisch:[mk]=Направете виртуелна машина
+Niederländisch:[nl]=Virtuele machine maken
+Norwegisch:[no]=Lag en virtuell maskin
+Portugiesisch:[pt]=Criar máquina virtual
+Polnisch:[pl]=Utwórz wirtualną maszynę
+Schwedisch:[sv]=Skapa virtuell maskin
+Serbisch:[sr]=Креирајте виртуелну машину
+Rumänisch:[ro]=Creați o mașină virtuală
+Russisch:[ru]=Создать виртуальную машину
+Schottisch-Gälisch:[gd]=Cruthaich inneal mas-fhìor
+Slowakisch:[sk]=Vytvorte virtuálny stroj
+Slowenisch:[sl]=Ustvarite virtualni stroj
+Spanisch:[es]=Crear una máquina virtual
+Tschechisch:[cs]=Vytvořte virtuální stroj
+Türkisch:[tr]=Sanal makine oluşturun
+Ukrainisch:[uk]=Vytvořte virtuální stroj
+Ungarisch:[hu]=Hozzon létre egy virtuális gépet
+Walisisch:[cy]=Creu peiriant rhithwir
+
+Arabisch:[ar]=قم بإنشاء آلة افتراضية
+Armenisch:[hy]=Ստեղծեք վիրտուալ մեքենա
+Aserbaidschanisch:[az]=Virtual maşın yaradın
+Afrikaans:[af]=Skep 'n virtuele masjien
+Chinesisch(Simplified):[zh_CN]=创建虚拟机
+Chinesisch(Traditional):[zh_TW]=創建虛擬機
+Georgisch:[ka]=შექმენით ვირტუალური მანქანა
+Hebräisch:[he]=צור מכונה וירטואלית
+Hindi:[hi]=वर्चुअल मशीन बनाएं
+Indonesisch:[id]=Buat mesin virtual
+Kasachisch:[kk]=Виртуалды машина жасау
+Khmer:[km]=បង្កើតម៉ាស៊ីននិម្មិត
+Kirgisisch:[ky]=Виртуалдык машинаны түзүү
+Koreanisch:[ko]=가상 머신 생성
+Kurdisch:[ku]=Makîneya virtual biafirînin
+Japanisch:[ja]=仮想マシンを作成する
+Malayisch:[ms]=Buat mesin maya
+Maori:[mi]=Waihangahia te miihini mariko
+Marati:[mr]=आभासी मशीन तयार करा
+Mongolisch:[mn]=Виртуал машин үүсгэх
+Nepalesisch:[ne]=भर्चुअल मेसिन सिर्जना गर्नुहोस्
+Paschtu:[ps]=مجازی ماشین جوړ کړئ
+Persisch/Farsi:[fa]=ماشین مجازی ایجاد کنید
+Somali:[so]=Samee mashiinka farsamada
+Suaheli/Swahili:[sw]=Unda mashine ya mtandaoni
+Sundanesisch:[su]=Jieun mesin virtual
+Tadschikisch:[tg]=Мошини виртуалӣ эҷод кунед
+Thailändisch:[th]=สร้างเครื่องเสมือน
+Turkmenisch:[tk]=Vytvořte virtuální stroj
+Uigurisch:[ug]=Vytvořte virtuální stroj
+Urdu:[ur]=Virtual mashina yarating
+Usbekisch:[uz]=Virtual mashina yarating
+Vietnamesisch:[vi]=Tạo một máy ảo
+Zulu:[zu]=Dala umshini obonakalayo
+
+:[]=
+
+Abgleich mit den Two Letter codes aus Dolphin?
+
+minimum: alle in
+
+when we do know all the language two letter codes, the
+whole thing might be automated via a script and Google
+Translate API

@@ -1,0 +1,73 @@
+[Desktop Entry]
+
+# CreateVBoxVMfromISO.desktop
+# check this file when editing with $ desktop-file-validate --warn-kde CreateVBoxVMfromISO.desktop
+# either install to: $HOME/.local/share/kservices5/ or: /usr/share/kservices5/
+
+Encoding=UTF-8
+Version=1.1
+
+# what KDE docs requires... resources:
+# https://develop.kde.org/docs/dolphin/service-menus/
+# https://freeaptitude.altervista.org/articles/populate-the-kde-service-menu.html
+ServiceTypes=KonqPopupMenu/Plugin
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-StartupNotify=false
+MimeType=application/x-cd-image;
+Icon=search
+Actions=CreateVBoxVMfromISO_Debian;CreateVBoxVMfromISO_Ubuntu;CreateVBoxVMfromISO_Other;CreateVBoxVMfromISO_Wine;
+
+# add this either as Action (default) or on Top Level of KonqPopupMenu
+X-KDE-Priority=TopLevel
+
+# display this as a submenu
+X-KDE-Submenu=Create Virtual Machine
+
+# TODO define an icon for submenu entry as this one is
+#Icon=apper
+
+# we do not necessaryly be the top most entry
+#InitialPreference=99
+# what does this?
+
+# what https://specifications.freedesktop.org/desktop-entry-spec/latest/ requires or recommends
+Name=CreateVBoxVMfromISO
+GenericName=Virtual Machine Creator
+Comment=This creates a VirtualBox virtual machine from this DVD image more or less automatically
+
+# using the next notation, MIME Type would not required above,
+# but this is historical and therfor deprecated notation
+#ServiceTypes=KonqPopupMenu/Plugin,application/x-cd-image
+
+# do not add me to popup menu if VirtualBox isn't installed
+TryExec=VBoxManage
+
+
+
+[Desktop Action CreateVBoxVMfromISO_Debian]
+Name=Debian Linux
+Icon=debian
+Icon=debian.png
+Exec=$HOME/.local/share/kservices5/ServiceMenus/CreateVBoxVMfromISO.sh -t debian -f %f
+InitialPreference=9
+
+[Desktop Action CreateVBoxVMfromISO_Ubuntu]
+Name=Ubuntu Linux
+Icon=ubuntu
+Icon=ubuntu.png
+Exec=$HOME/.local/share/kservices5/ServiceMenus/CreateVBoxVMfromISO.sh -t ubuntu -f %f
+InitialPreference=8
+
+[Desktop Action CreateVBoxVMfromISO_Other]
+Name=Other Linux
+Icon=linux
+Exec=$HOME/.local/share/kservices5/ServiceMenus/CreateVBoxVMfromISO.sh -t linux %f
+InitialPreference=2
+
+[Desktop Action CreateVBoxVMfromISO_Wine]
+Name=Wine Linux
+Icon=wine
+#Icon=$HOME/.local/share/kservices5/ServiceMenus/wine.png
+Exec=$HOME/.local/share/kservices5/ServiceMenus/CreateVBoxVMfromISO.sh -a -f %f
+InitialPreference=1
