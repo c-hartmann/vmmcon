@@ -297,6 +297,7 @@ yes=false
 dry=false
 list_running=false
 list_stopped=false
+desktop=false
 # select=false
 
 vmmcon_defaults_editor="${EDITOR:-vim}"
@@ -697,7 +698,7 @@ function _user_profile()
 # 	for conf in "${PROFILES_DIR_LOCAL}"/*.conf "${PROFILES_DIR}"/*.conf; do
 	for conf in "${PROFILES_DIR}"/?*.conf; do
 		name="UNKNOWN"
-# 		. "$conf"
+# 		. "$profile_conf"
 		# get simple tag from path to config file
 		tag="${conf%.conf}"
 		tag="${tag##*/}"
@@ -708,7 +709,7 @@ function _user_profile()
 		if ! _is_in_profile_select_list "$tag"; then
 # 			profile_select_list[$i]="$tag" # TODO: $name ?
 			# shellcheck disable=SC1090
-			. "$conf"
+			. "$profile_conf"
 			profile_select_list[$i]="$name"
 			profile_select_list_helper[$i]="$tag"
 			((i++))
@@ -1045,7 +1046,6 @@ function _create_desktop_entry() # $VM
 function _delete_desktop_entry() # $VM
 {
 	local _vm="$1"
-
 	local -l _my_vendor_prefix="org.${MY_NEW_NAME}"
 
 	### TODO: there are actualy two of these! there is also: ~/.gnome/apps/
@@ -1058,12 +1058,13 @@ function _delete_desktop_entry() # $VM
 	_application_desktop_filename="${_my_vendor_prefix}.vm.$(_get_simple_name "$_vm").desktop"
 	_application_desktop_filepath="${_application_desktop_dir}/${_application_desktop_filename}"
 	if [[ -f "${_application_desktop_filepath}" ]]; then
-		_xdg_desktop_menu_command="$(type -p xdg-desktop-menu)"
-		if [[ -n "${_xdg_desktop_menu_command}" ]] ; then
-			${_xdg_desktop_menu_command} 'uninstall' "${_application_desktop_filename}"
-		else
+		# NOTE: xdg-desktop-menu seems to be very nitpicing about names, and as ours seems to not comply with the specs, the uninstall command does not delete the file
+# 		_xdg_desktop_menu_command="$(type -p xdg-desktop-menu)"
+# 		if [[ -n "${_xdg_desktop_menu_command}" ]] ; then
+# 			${_xdg_desktop_menu_command} 'uninstall' "${_application_desktop_filename}"
+# 		else
 			rm -f "${_application_desktop_filepath}"
-		fi
+# 		fi
 	else
 		printf 'Application desktop file does not exists: %s\n' "${_application_desktop_filepath}" >&2
 	fi
@@ -1165,6 +1166,13 @@ function _run_command()
 		shift
 	done
 	_command=${_argv[0]}
+	# TODO: experimental idea to handle aliases, such as new | launch | up for 'create'
+	declare -A command_aliases
+	command_aliases[launch]='create'
+	command_aliases[new]='create'
+	command_aliases[up]='create'
+	# wenn element in array, dann Wert als _command
+	[[ -v command_aliases[$_command] ]] && _command="${command_aliases[$_command]}"
 	# TODO are multiple statements of the same case allowed? this could be used
 	#      to put all the startup parts into a common one for clone, import, create
 	# TODO sort commands by name to find them easier
@@ -1210,7 +1218,8 @@ function _run_command()
 			echo ${valid_commands[@]}
 			_return=0
 		;;
-		create | new | launch | up )
+# 		create | new | launch | up )
+		create ) # hopefully now handled via new aliases construct
 			_created=1
 			### if filepath not set via option -f, use first argument instead
 			if [[ -z "$filepath" ]]; then
@@ -1227,7 +1236,7 @@ function _run_command()
 			if [[ -z "$filepath" ]]; then
 				for dir in "$iso_download_top_dir" "$HOME/Downloads" "$HOME/Download" "$HOME" "/tmp" ; do
 					if [[ -d "$dir" ]]; then
-						_verbose "Asking for iso file path …" >&2
+						_verbose "Asking for iso file …" >&2
 						filepath=$(_user_file_path "$dir")
 						[[ -n "$filepath" ]] || _canceled_exit
 						_verbose "\$filepath=$filepath" "[by user dialog]"
@@ -1237,11 +1246,11 @@ function _run_command()
 			fi
 			### still no file path? > fail
 			if [[ -z "$filepath" ]]; then
-				_error_exit "No ISO image file path given. Giving up. ($LINENO)"
+				_error_exit "No ISO image file given. Giving up. ($LINENO)"
 			fi
 			### check if we have anyfile and fail if not
 			if [[ ! -f "$filepath" ]]; then
-				_error_exit "Unsupported command or specified ISO image file path does not exist:  $filepath. Giving up. ($LINENO)"
+				_error_exit "Specified ISO image file does not exist:  $filepath. Giving up. ($LINENO)"
 			fi
 			# TODO this shall go into a function: _check_file_on_mime_type $file $mimetype
 			### check on right mime type
@@ -1250,14 +1259,14 @@ function _run_command()
 			if [[ -n "$xdg_mime" ]]; then
 				printf '%s\n' "checking mime type …" >&2
 				mime_type="$($xdg_mime query filetype "$filepath" 2>/dev/null)"
-				[[ "$mime_type" =~ application/x-cd-image ]] || _error_exit "Specified ISO file path does not fulfil mime type requirement: 'application/x-cd-image'. Giving up ($LINENO)"
+				[[ "$mime_type" =~ application/x-cd-image ]] || _error_exit "Specified ISO file does not fulfil mime type requirement: 'application/x-cd-image'. Giving up ($LINENO)"
 			fi
 			### check if we have a valid ISO file and fail if not
 			# TODO replace 'which' by either 'type' or 'command'
 			isovfy="$(which isovfy)" # TODO: use file -p instead?
 			if [[ -n "$isovfy" ]]; then
 				printf '%s\n' "Veryfying iso image …" >&2
-				$isovfy "$filepath" >/dev/null 2>&1 || _error_exit "Specified ISO file path could not be veryfied as a valid ISO image. Giving up ($LINENO)"
+				$isovfy "$filepath" >/dev/null 2>&1 || _error_exit "Specified ISO file could not be veryfied as a valid ISO image. Giving up ($LINENO)"
 			fi
 			### use filename as in filepath to search for a profile
 			filename="${filepath##*/}"
@@ -1338,18 +1347,18 @@ function _run_command()
 			[[ -n $match ]] && printf 'Using match: %s\n' "$match" >&2
 			[[ -n $profile ]] && printf 'Using profile: %s\n' "$profile" >&2
 			### run profile config file, if it is there, warn on failure if not
-			conf="${PROFILES_DIR}/${profile}.conf"
-			if [[ -f "$conf" ]]; then # TODO reverse test to ! and save code lines
-				printf '%s\n' "Using profile config: $conf" >&2
+			profile_conf="${PROFILES_DIR}/${profile}.conf"
+			if [[ -f "$profile_conf" ]]; then # TODO reverse test to ! and save code lines
+				printf '%s\n' "Using profile config: $profile_conf" >&2
 				# shellcheck disable=SC1090
-				. "$conf"
+				. "$profile_conf"
 # 			else
-# 				_warning "profile does not exist: '$conf'. Continue with fallback 'linux'?" || _canceled_exit
+# 				_warning "profile does not exist: '$profile_conf'. Continue with fallback 'linux'?" || _canceled_exit
 # 				conf="${PROFILES_DIR}/linux.conf"
-# 				if [[ -f "$conf" ]]; then
-# 					printf '%s\n' "Running fallback config: $conf" >&2
+# 				if [[ -f "$profile_conf" ]]; then
+# 					printf '%s\n' "Running fallback config: $profile_conf" >&2
 # 					# shellcheck disable=SC1090
-# 					. "$conf"
+# 					. "$profile_conf"
 # 				fi
 			fi
 # 			### run local profile config file, if it is there
@@ -1811,8 +1820,20 @@ function _run_command()
 		resume | restore ) # from a 'paused' or 'suspended' state
 			_error_exit "Command not yet implemented ($LINENO): '$_command'. Realy sorry"
 		;;
-		search )
-			_error_exit "Command not yet implemented ($LINENO): '$_command'. Realy sorry"
+		'search' )
+			_matched=1
+			[[ -z "${_argv[1]+x}" ]] && _error_exit "This command requires an argument ($LINENO)"
+			_vm="${_argv[1]}"
+			if $list_running; then
+				_function="vmms::list_vms_running"
+			elif $list_stopped; then
+				_function="vmms::list_vms_stopped"
+			else
+				_function="vmms::list_vms"
+			fi
+			$_function | grep -i "${_vm}" && _matched=0
+			_exit=$_matched
+			_return=$_matched
 		;;
 		search-desktop-entry )
 			_matched=1
@@ -1952,7 +1973,7 @@ fi
 # printf "$(gettext 'Welcome to'): ${MY_TITLE} \n"
 # printf "$(gettext 'Version'): ${VERSION}\n"
 # printf "$(gettext 'Welcome to'): ${MY_TITLE} Version: ${VERSION}\n"
-printf '%s v%s\n' "${MY_TITLE}" "${VERSION}" >&2
+# printf '%s v%s\n' "${MY_TITLE}" "${VERSION}" >&2
 
 ### import vmm based interface set
 if [[ -v VMM ]]; then
@@ -2014,6 +2035,7 @@ acdE:f:ghI:i:Nn:o:P:prS:stuVvxy \
 auto,\
 auto-magic,\
 debug,\
+desktop,\
 dry-run,\
 file:,\
 from:,\
@@ -2079,8 +2101,15 @@ while [[ $# -gt 0 ]]; do
 	case $OPT in
 		-a | --auto | --auto-magic | --auto-profile )
 			_verbose "Running in automagic mode …" >&2
+			# shellcheck disable=SC2034
 			auto=true
 			_verbose "auto=$auto"
+			shift
+		;;
+		--desktop )
+			# shellcheck disable=SC2034
+			desktop=true
+			_verbose "desktop=$desktop"
 			shift
 		;;
 		-d | --dry-run )

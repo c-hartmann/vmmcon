@@ -34,17 +34,6 @@ function _vbox_manage()
 
 
 
-function _vbox_list_vms_helper_getter()
-{
-	_vbox_manage 2 list vms | sed 's/ {.*}//gi' | sed 's/"//g'
-}
-function _vbox_list_vms_helper_sorter()
-{
-# 	( echo; sort --numeric-sort --reverse )
-#	( echo; sort --numeric-sort )
-	( sort --numeric-sort -k 2 -r )  # | sort -k 2 -r
-}
-
 function vmms::clone_vm() # "$VM"
 {
 	local _vm="$1"
@@ -308,7 +297,7 @@ function vmms::create_vm()
 	_vm_disk_variants[dynamic]="Standard"
 	_vm_disk_variants[fixed]="Fixed"
 	### ensure array keys to be lower cased
-	declare -l _vm_disk_alloc="$vm_disk_alloc"
+	declare -l _vm_disk_alloc="${vm_disk_alloc}" # other way to lower the case: _vm_disk_alloc="${vm_disk_alloc,,}"
 	_vm_disk_variant=${_vm_disk_variants[$_vm_disk_alloc]}
 	printf "creating $vm_disk_count disk(s) of $vm_disk_size GB type '$vm_disk_type'\n" >&2
 	### create hard disk if not disabled (disk count == 0)
@@ -486,6 +475,34 @@ function vmms::import_applicance() # "$VM"
 	# https://www.virtualbox.org/manual/ch09.html#legacy-fullscreen-mode
 	# UNTESTED
  	_vbox_manage 4 setextradata "$_vm" "GUI/Fullscreen" false
+}
+function _vbox_list_vms_helper_getter()
+{
+	# TODO: in desktop mode this lists the simple names. instead it should list the real 'Name' from .desktop files # DONE!
+	local -l _my_vendor_prefix="org.${MY_NEW_NAME}"
+	local _application_desktop_dir="${HOME}/.local/share/applications/${MY_NEW_NAME}" # this should be a global ENV
+# 	_application_desktop_filename="${_my_vendor_prefix}.vm.$(_get_simple_name "$_vm").desktop"
+# 	_application_desktop_filepath="${_application_desktop_dir}/${_application_desktop_filename}"
+	if $desktop; then
+	  (
+		cd ${_application_desktop_dir}/
+# 		ls -1 *.desktop | sed "s/${_my_vendor_prefix}\.vm\.//" | sed 's/\.desktop//'
+		cat *.desktop | grep '^Name=' | sed 's/^Name=//'
+	  )
+	else
+		_vbox_manage 2 list vms | sed 's/ {.*}//gi' | sed 's/"//g'
+	fi
+}
+function _vbox_list_vms_helper_sorter()
+{
+# 	( echo; sort --numeric-sort --reverse )
+#	( echo; sort --numeric-sort )
+# 	( sort --numeric-sort -k 2 -r )  # | sort -k 2 -r
+	sort --numeric-sort -k 2 -r
+}
+function _vbox_list_vms_helper_prefix()
+{
+	sed ''
 }
 function vmms::list_vms() # -
 {
