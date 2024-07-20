@@ -99,7 +99,7 @@ A list of relevant files and directories (user installation)
 Base files (VBox only):
 
 ```
-~/.bash_completion.d/vmmcon
+~/.bash_completion.d/vmmcon-completion.bash
 ~/.config/vmmconrc
 ~/.local/bin/vmmcon
 ~/.local/share/vmmcon/vmms/vbox/functions.sh
