@@ -1,7 +1,29 @@
+#
+# TODO hypercon (fka as vmmcon, aka hopper, fka vmctl)
+#
 
-#
-# TODO hypercon (fka as vmmcon)
-#
+list command might prefix all VM by VMM. (sample: VBox: debian-12.3-2014-07-20)
+
+@naming:  HOPPER = VMMCON + desktop integration :)
+
+delete-desktop-entry benötigt eine spezielle bash completion, die
+nach desktop-entry Dateien sucht
+
+Den ersten (Create?) und zweiten (with what name?) Dialog kann man
+ohne interaktive Verluste zusammen legen? (Es braucht nur den zweiten)
+
+JSON Configs: sollten per se erstmal als VIELE Dateien existieren,
+weil sie so einfacher zu maintainen / zu ergänzen sind. ABER sie
+sind so langsamer zu lesen. Lösung: ein Cache, der automtisch oder
+aktiv erzeugt wird und alle Confgigs in EINER Datei zusammen führt.
+
+check existence of a dependency tool with:
+if ! command -v $tool &> /dev/null; then
+  exit 1
+fi
+found here: https://youtu.be/4ygaA_y1wvQ?si=5WpWazCcIBMmrRDq&t=1651
+
+? set -euo pipefail ?
 
 Evtl. den Teil Profile Selection eliminieren - irgendwie ist das gegen
 die Grundidee dieses Tools. Evtl. sollten auch die Dialoge nicht Teil
@@ -10,7 +32,8 @@ Den Namen kann das Tool über eine (versteckte) Option liefern (aus dem
 Namen der ISO Datei) und die kann dann in der Desktop Inetgration 
 angezeigt und korrigiert werden. (vmmcon-di-kde, vmmcon-desktop-creator-gnome)
 
-Temporäre Dateien über trap(1) löschen (laschen)
+Temporäre Dateien über trap(1) löschen (laschen):
+trap "rm -f $tempfile" EXIT ... (more Signals required?)
 
 auch bei vornehmlicher Nutzung des Desktop Integration sollte alternativ
 zu k- oder x-dialog oder sonstwas die Nutzung eines Terminals für die

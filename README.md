@@ -94,42 +94,44 @@ generic options:
 
 ## Installation
 
-A list of relevant files and directories and their placement relative to $HOME/
+A list of relevant files and directories (user installation)
 
 Base files (VBox only):
 
 ```
-.config/vmmconrc
-.local/bin/vmmcon
-.local/share/vmmcon/vmms/vbox/functions.sh
-.local/share/vmmcon/locale/de/LC_MESSAGES/create-vm-from-iso-vbox.*
-.local/share/vmmcon/automagic.csv
-.local/share/vmmcon/automagic.local.csv
-.local/share/vmmcon/matches/*.conf
-.local/share/vmmcon/profiles/*.conf
-.local/share/vmmcon/templates/xdg/desktop-entry-template.desktop
-.local/share/vmmcon/templates/xdg/desktop-menu-category.directory
-.local/share/vmmcon/templates/xdg/desktop-menu-category.menu
-.local/share/vmmcon/icons/display-and-tower.svg
+~/.bash_completion.d/vmmcon
+~/.config/vmmconrc
+~/.local/bin/vmmcon
+~/.local/share/vmmcon/vmms/vbox/functions.sh
+~/.local/share/vmmcon/locale/de/LC_MESSAGES/create-vm-from-iso-vbox.*
+~/.local/share/vmmcon/automagic.csv
+~/.local/share/vmmcon/automagic.local.csv
+~/.local/share/vmmcon/matches/*.conf
+~/.local/share/vmmcon/profiles/*.conf
+~/.local/share/vmmcon/automagic.json
+~/.local/share/vmmcon/templates/xdg/desktop-entry-template.desktop
+~/.local/share/vmmcon/templates/xdg/desktop-menu-category.directory
+~/.local/share/vmmcon/templates/xdg/desktop-menu-category.menu
+~/.local/share/vmmcon/icons/display-and-tower.svg
 ```
 
 Directories used:
 
 ```
-.local/share/applications/vmmcon/
-.local/share/desktop-directories/
-.config/menus/applications-merged/
+~/.local/share/applications/vmmcon/
+~/.local/share/desktop-directories/
+~/.config/menus/applications-merged/
 ```
 
 KDE desktop integration (Plasma 5):
 
 ```
-.local/share/kservices5/ServiceMenus/create-vm-from-iso-vbox.desktop
+~/.local/share/kservices5/ServiceMenus/create-vm-from-iso-vbox.desktop
 ```
 
 KDE desktop integration (Plasma 6):
 
 ```
-.local/share/kio/servicemenus/create-vm-from-iso-vbox.desktop
+~/.local/share/kio/servicemenus/create-vm-from-iso-vbox.desktop
 ```
 
