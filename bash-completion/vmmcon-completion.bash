@@ -6,7 +6,7 @@
 # /usr/share/bash-completion/completions/
 # /usr/share/bash-completion/completions/gdbus
 
-
+# https://stackoverflow.com/questions/23998364/bash-completion-script-to-complete-file-path-after-certain-arguments-options
 
 # function to create to create an array of vm names
 _vmmcon_vm_list()
@@ -54,6 +54,20 @@ _vmmcon()
 		COMPREPLY=( $( compgen -W "$( _vmmcon_commands )" -- $current_word ) )
 	else
 			case $previous_word in
+				create | launch | new )
+					shopt -s nullglob
+					# compopt -o dirnames
+					# compopt -o filenames
+					compopt -o default
+					local isos=(*.iso *.ISO *.img *.IMG)
+					COMPREPLY=($(compgen -W '${isos[@]}' -- "$current_word"))
+				;;
+				import )
+					shopt -s nullglob
+					compopt -o default
+					local ovfs=(*.ova *.OVA *.ovf *.OVF *.xva *.XVA)
+					COMPREPLY=($(compgen -W '${ovfs[@]}' -- "$current_word"))
+				;;
 				clone | close | delete | destroy | enter | exec | export | halt \
 				      | info | list | login | move | open | pause | poweroff | reboot \
 				      | remove | rename | reset | restart | run | shell | shutdown \
@@ -110,7 +124,9 @@ _vmmcon()
 
 }
 # main (connect autocompletion with function here)
+# complete -o dirnames -F _vmmcon hopper
+# complete -o dirnames -F _vmmcon vmmcon
+# complete -o filenames -F _vmmcon hopper
+# complete -o filenames -F _vmmcon vmmcon
 complete -F _vmmcon vmmcon
-complete -F _vmmcon hypcon
-complete -F _vmmcon hypercon
-complete -F _vmmcon hopper
+
