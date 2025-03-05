@@ -1,14 +1,23 @@
 AlmaLinux;redhat
 Alpine;linux
 ALT Linux;linux
+Anarchy;arch
 Antergos;arch
 antiX;debian
 Arch;arch
 ArchBang;arch
 Archcraft;arch
+Archlabs;arch
+Archman;arch
 Arco;arch
+Artix;arch
+Aurora;fedora
+Azure;linux
+bazzite;fedora
 Biglinux;manjaro
+BlackArch;arch
 BlendOS;arch
+Bluefin;fedora
 Bluestar;arch
 Bodhi;ubuntu
 BunsenLabs;debian
@@ -67,6 +76,7 @@ Maui;debian
 Mageia;mandriva
 Mandriva;mandriva
 Manjaro;arch
+Parabola;arch
 MassOS;linux
 MocaccinoOS;gentoo
 MX;debian
@@ -77,7 +87,9 @@ Nitrux;debian
 NixOS;linux
 Nobara;fedora
 Novell;suse
+OI;solaris
 openSUSE;opensuse
+OpenBSD;openbsd
 Oracle;redhat
 Ozon;fedora
 Parabola;arch
@@ -87,15 +99,18 @@ PCLinuxOS;linux
 pearOS;arch
 Pentoo;gentoo
 Peppermint;debian
+Playtron;fedora
 Pop;ubuntu
+Pop-OS;ubuntu
 Porteus;linux
 Proxmox;debian
 Puppy;linux
 PureOS;debian
 Q4OS;debian
 Qubes;fedora
-RebornOS;arch
+Reborn;arch
 Red Hat;redhat
+RefreshOS;debian
 Regata;opensuse
 RHEL;redhat
 risiOS;fedora
@@ -105,6 +120,7 @@ Rocky;redhat
 Rolling-Rhino;ubuntu
 ROSA;mandriva
 Sabayon;gentoo
+Salient;arch
 Scientific;redhat
 Siduction;debian
 Slackware;linux
@@ -119,6 +135,7 @@ Tails;debian
 Tiny Core;linux
 Trisquel;ubuntu
 TurnKey;debian
+TUXEDO;ubuntu
 Tuxwiz;debian
 Ubuntu;ubuntu
 Univention;debian
@@ -128,6 +145,7 @@ Void;linux
 Voyager;ubuntu
 Windows;windows
 wmlive;debian
+Xero;arch
 Xubuntu;ubuntu
 Zenwalk;linux
 Zorin;ubuntu

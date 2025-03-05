@@ -1,7 +1,23 @@
 ###
 ### ~/.config/vmmconrc
-### (former path: ~/.local/share/vmmcon/vmmconrc)
+### old path: ~/.local/share/vmmcon/vmmconrc
+### new path: ~/.config/vmmcon/vmmcon.rc
 ###
+
+
+# TODO:
+# this file might get splitted into a all VM part and individual parts for each VMM provider...
+### ~/.config/vmmcon/vmmcon.rc 		# or keep the old name (vmmconrc) and have a directory alongside 
+### ~/.config/vmmcon/vbox.rc 		# but having one file without any provider is pure bullshit
+### ~/.config/vmmcon/qemo.rc 		# so these can happyly coexist in one common directory
+### ~/.config/vmmcon/libvirt.rc 	# vmm.rc !?! erst, wenn dies hier hypercon heißt
+### ~/.config/vmmcon/vmware.rc
+### ~/.config/vmmcon/boxes.rc
+
+### /home/christian/.config/aqemu/AQEMU.conf (ini format)
+### /home/christian/.aqemu/ (for vm configs) (VBox hat ~/.VirtualBox)
+
+
 
 vm_tcp_ssh_username="$LOGNAME"
 # vm_host_ssh_port=2222
@@ -14,10 +30,6 @@ vm_tcp_ssh_username="$LOGNAME"
 ### directory your ISO downloads generaly go into. if left empty or unset the
 ### search for ISO files will try $HOME/Downloads
 iso_download_top_dir="$HOME/Downloads/ISOs"
-
-### TODAY is used as a base for a 'STAMP' trailing the new VMs name
-TODAY="$(date --iso-8601)"
-
 
 # TODO: are there non-kde associated commands to create kde like config
 # files? (such as kwriteconfig5 / kreadconfig)
@@ -55,7 +67,8 @@ vmmcon_defaults_editor="kwrite"
 
 
 # some first thoughts on qemu way to start vms
-qemu_run_command='kvm' # qemu-system-x86_64, qemu-system-i386 (kvm enabled full hardware based virtualization)
+# 'kvm' is generly a symbolic link to either qemu-system-x86_64 or qemu-system-i386 (kvm enabled full hardware based virtualization)
+qemu_run_command='kvm'
 
 
 
@@ -73,7 +86,8 @@ create_desktop_menu_entry_icon=preferences-system-startup
 #create_desktop_menu_entry_native_command=true
 
 # TODO disk and memory sizes
-vm_setup_default_profile='minimal' # or "default", "comfort", "desktop", "server"
+# or "default", "comfort", "desktop", "server"
+vm_setup_default_profile='minimal' 
 
 # TODO unattended install (debian: preseed, other: ???)
 vm_unattended_install='false'
@@ -146,8 +160,10 @@ vm_unattended_install='false'
 vmm='vbox'
 
 ### Linux guests should use KVM as Hypervisor
-# vm_hypervisor="kvm" # DEPRICATED
-vbox_vm_paravirtprovider='kvm' # 'kvm' is recommended for Linux guests
+### https://superuser.com/questions/945910/how-to-select-paravirtualization-interface-in-virtualbox
+# 'kvm' is recommended for Linux, 'default' for Linux and Windows guests
+#vbox_vm_paravirtprovider='default'
+vbox_vm_paravirtprovider='kvm'
 
 ### the name of the new VM is derived from the filename of ISO image and
 ### an appended 'STAMP'. the general form of the STAMP is "<space>($TODAY)"
@@ -155,7 +171,10 @@ vbox_vm_paravirtprovider='kvm' # 'kvm' is recommended for Linux guests
 #create_stamp=$(false)
 
 ### or you can set the STAMP itself here:
-STAMP="-${TODAY}"
+### TODAY is used as a base for a 'STAMP' trailing the new VMs name
+# TODAY="$(date --iso-8601)"
+# STAMP="-${TODAY}"
+STAMP="-$(date --iso-8601)"
 
 ### HINT: entries might be created for existing VMs with this command:
 ### $ vmmvtl 'create-desktop-entry' "$VM"
@@ -174,13 +193,13 @@ STAMP="-${TODAY}"
 # as of: https://www.virtualbox.org/ticket/20525
 #   and: https://www.virtualbox.org/ticket/20526
 # currently create vms with just one core (on intel)
-vm_cpu_count=2
+vm_cpu_count=0
 
 ### the vm cpu divider will be used to compute the number of cpus if not given
 ### this is a simple integer division. so a value of 3 gives you 2 vm cpus
 ### if the host e.g. has 8 cores: 8 / 3 => 2
 ### a value of 2 gives you 4 vm cpus: 8 / 2 => 4
-vm_cpu_count_divider=2
+vm_cpu_count_divider=4
 
 ### https://www.it-swarm.com.de/de/virtualbox/wann-muss-ich-pae-nx-verwenden/944835828/
 ### > there is no use of PAE for 64 bit guests
@@ -195,8 +214,8 @@ vm_cpu_count_divider=2
 ### > is a hardware-assisted virtualization technology which makes it possible
 ### > to avoid the overhead associated with software-managed shadow page tables.
 vm_pae="off"                                   # (TODO: rename to vbox_* scheme)
-vm_ioapic="on"                                 # (TODO: rename to vbox_* scheme)
-vm_nested_virt="off"                           # (TODO: rename to vbox_* scheme)
+vm_ioapic="on"                                 # (TODO: rename to vbox_* scheme) Be sure to enable I/O APIC for virtual machines that you intend to use in 64-bit mode. (from the docs)
+vm_nested_virt="off"                           # (kvm supports this as well, so it can be left in the genral config)
 
 # howto read host cpu support for this?
 # > grep -E '\bept\b|\bnpt\b' /proc/cpuinfo
@@ -221,8 +240,8 @@ vm_firmware="bios" # bios|efi|efi32|efi64
 
 ### incompatible vbox ext pack can prevent system
 ### from booting if usb 2 or 3 support is enabled
-vm_usbehci="off" # USB-2.0, default: "off"
-vm_usbxhci="off" # USB-3.0, default: "off"
+vm_usb_ehci="off" # USB-2.0, default: "off"
+vm_usb_xhci="off" # USB-3.0, default: "off"
 
 
 
@@ -235,9 +254,9 @@ vm_disk_type="vdi"                             # (TODO: rename to vbox_* scheme)
 
 vm_disk_count=1
 
-### disk size set to 40 GB here. perfect candidate for setting to different
-### sizes in temlate files
-vm_disk_size=40
+### disk size set to 20 GB here. perfect candidate for setting to different
+### sizes in template / recipe files
+vm_disk_size=20
 
 ### disk size allocation 'dynamic' (default) or 'fixed' size disk creation
 vm_disk_alloc="dynamic"                        # (TODO: rename to vbox_* scheme)
@@ -262,7 +281,8 @@ vm_vram_size=256
 vm_gfx_controller="vmsvga"   # default: "vmsvga", other: "vboxvga", "vboxsvga", "none"
 
 ### https://docs.oracle.com/en/virtualization/virtualbox/6.0/user/guestadd-video.html
-vm_gfx_accelerate3d="on"   ### *not* with 'vboxsvga' controller
+# vm_gfx_accelerate3d="on"   ### *not* with 'vboxsvga' controller
+vm_gfx_accelerate3d="off"   ### temporary set to off due to a bug in vbox 7.x
 
 #vm_efi_gfx_resolution="1280x800"  # WXGA
 
@@ -274,3 +294,9 @@ vm_gfx_accelerate3d="on"   ### *not* with 'vboxsvga' controller
 # human interface devices
 vm_hid_pointing="usbtablet"
 vm_hid_keyboard="ps2"
+
+
+### network (new by 2024-12-01)
+vm_network_mode="nat" # or "bridged", "hostonly", "...",
+
+vm_disk_size_dynamic=true  # preallocating might improve performance on installtion and beyond. use vm_disk_size_dynamic=false to enable preallocation

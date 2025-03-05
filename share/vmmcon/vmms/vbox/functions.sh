@@ -7,9 +7,16 @@ function _set_vbox_manage_command()
 	### tradionaly there is VBoxManage, but looks like the
 	### project is moving to lowercased command names, as there
 	### are more of these than in traditional mixed spelling
-	#ä TODO try to use micxd case, if lower fails
+	#ä TODO try to use mixed case, if lower fails
 # 	_vboxmanage_cmd="$(type -p VBoxManage)"
-	_vboxmanage_cmd="$(type -p vboxmanage)"
+# 	_vboxmanage_cmd="$(type -p vboxmanage)"
+	### in fact both of these are just symbolic links to /usr/bin/VBox,
+	### but there are move of these links and VBox probably evaluates
+	### $0 before doing anything. And VBox actualy is a shell script,
+	### that internaly calls /usr/lib/virtualbox/VBoxManage for both
+	### names above.
+	_vboxmanage_cmd_avails=($(type -p VBoxManage vboxmanage VBox))
+	_vboxmanage_cmd="${_vboxmanage_cmd_avails[0]}"
 }
 _set_vbox_manage_command
 
@@ -143,7 +150,47 @@ function vmms::create_vm_ssh_login()
 		_created=0
 	fi
 }
-function vmms::create_vm()
+function vmms::get_vm_network_mode()
+{
+	# TODO: support anything else than Bridged and NAT?
+	local _vm="$1"
+	VBoxManage showvminfo "$_vm" | grep -oE 'Bridged|NAT' 
+}
+function vmms::get_vm_bridged_ip_addr()
+{
+	local _vm="$1"
+# 	typeset -l arp="$(_vbox_manage 2 showvminfo "$_vm" \
+	typeset -l arp="$(VBoxManage showvminfo "$_vm" \
+	  | grep -oe 'MAC: [^,]*,' \
+	  | awk '{print $2}' \
+	  | grep -oe '[0-9A-F]*' \
+	  | sed 's/\(..\)/\0\:/g' \
+	  | sed -e 's/:$//')"
+	arp -a | grep "$arp" | grep -o '(.*)' | sed 's/[()]//g'
+}
+function vmms::create_vm_serial_port()
+{
+	local _vm="$1"
+	_created=1
+	_existing_ssh_port=$(vmms::get_ssh_port "$_vm")
+	if [[ -n "$_existing_ssh_port" ]]; then
+		_error_exit "ssh port already exists: $_existing_ssh_port"
+	else
+# 		_vm_pf_rulename="VMMCON-SSH"
+:
+# 		_vbox_manage 4 modifyvm "$_vm" --natpf${_vm_nnet_adapter} "${_vm_pf_rulename},tcp,${_host_ip_address},${_vm_tcp_ssh_port},${_vm_ip_address},22"
+
+# 		_vm_tcp_ssh_port=$(create_random_tcp_port_num)
+# 		_vm_tcp_ssh_username=${vm_tcp_ssh_username:-$LOGNAME}
+# 		_vbox_manage 4 setextradata "$_vm" 'vmmcon-tcp-ssh-port' ${_vm_tcp_ssh_port}
+		vmms::set_ssh_port "$_vm"
+		vmms::set_ssh_port_forwarding_rule "$_vm"
+# 		_vbox_manage 4 setextradata "$_vm" 'vmmcon-tcp-ssh-usernam' ${_vm_tcp_ssh_username}
+		vmms::set_ssh_username "$_vm"
+		_created=0
+	fi
+}
+function vmms::_create_vm()
 {
 	# TODO https://docs.oracle.com/en/virtualization/virtualbox/6.0/admin/security-recommendations.html
 
@@ -186,8 +233,8 @@ function vmms::create_vm()
 
 	### usb capabilities
 	_vbox_manage 4 modifyvm "$_vm" --usb "$vm_usb"
-	_vbox_manage 4 modifyvm "$_vm" --usbehci "$vm_usbehci"
-	_vbox_manage 4 modifyvm "$_vm" --usbxhci "$vm_usbxhci"
+	_vbox_manage 4 modifyvm "$_vm" --usbehci "$vm_usb_ehci"
+	_vbox_manage 4 modifyvm "$_vm" --usbxhci "$vm_usb_xhci"
 
 	### audio
 	# TODO: some things are depricated now. see: https://www.virtualbox.org/wiki/Changelog-7.0
@@ -223,26 +270,39 @@ function vmms::create_vm()
 	_vm_ip_address=''
 	_host_ip_address=''
 
-# 	vm_pf_rulename="VMMCON-SSH"
-# 	_vbox_manage 4 modifyvm "$_vm" --natpf${_vm_nnet_adapter} "${vm_pf_rulename},tcp,${_host_ip_address},${_vm_tcp_ssh_port},${_vm_ip_address},22"
-# 	_vm_tcp_ssh_port=$(create_random_tcp_port_num)
-# 	_vm_tcp_ssh_username=${vm_tcp_ssh_username:-$LOGNAME}
-# 	_vbox_manage 4 setextradata "$_vm" 'vmmcon-tcp-ssh-port' ${_vm_tcp_ssh_port}
-# 	_vbox_manage 4 setextradata "$_vm" 'vmmcon-tcp-ssh-username' ${_vm_tcp_ssh_username}
-# 	vmms::set_ssh_port ${_vm_tcp_ssh_port}
-	vmms::create_vm_ssh_login "$_vm"
+	
+	typeset -l _vm_network_mode="${vm_network_mode:-'nat'}"
+	
+	if [[ $_vm_network_mode == 'nat' ]]; then
+	
+# 		vm_pf_rulename="VMMCON-SSH"
+# 		_vbox_manage 4 modifyvm "$_vm" --natpf${_vm_nnet_adapter} "${vm_pf_rulename},tcp,${_host_ip_address},${_vm_tcp_ssh_port},${_vm_ip_address},22"
+# 		_vm_tcp_ssh_port=$(create_random_tcp_port_num)
+# 		_vm_tcp_ssh_username=${vm_tcp_ssh_username:-$LOGNAME}
+# 		_vbox_manage 4 setextradata "$_vm" 'vmmcon-tcp-ssh-port' ${_vm_tcp_ssh_port}
+# 		_vbox_manage 4 setextradata "$_vm" 'vmmcon-tcp-ssh-username' ${_vm_tcp_ssh_username}
+# 		vmms::set_ssh_port ${_vm_tcp_ssh_port}
+		vmms::create_vm_ssh_login "$_vm"
 
-	# Another one for HTTP(s) servers?
-	vm_pf_rulename="VMMCON-HTTP"
-	_vm_tcp_http_port=$(create_random_tcp_port_num)
-	_vbox_manage 4 modifyvm "$_vm" --natpf${_vm_nnet_adapter} "${vm_pf_rulename},tcp,${_host_ip_address},${_vm_tcp_http_port},${_vm_ip_address},80"
-	_vbox_manage 4 setextradata "$_vm" 'vmmcon-tcp-http-port' ${_vm_tcp_http_port}
+		# Another one for HTTP(s) servers?
+		vm_pf_rulename="VMMCON-HTTP"
+		_vm_tcp_http_port=$(create_random_tcp_port_num)
+		_vbox_manage 4 modifyvm "$_vm" --natpf${_vm_nnet_adapter} "${vm_pf_rulename},tcp,${_host_ip_address},${_vm_tcp_http_port},${_vm_ip_address},80"
+		_vbox_manage 4 setextradata "$_vm" 'vmmcon-tcp-http-port' ${_vm_tcp_http_port}
 
-	vm_pf_rulename="VMMCON-HTTPS"
-	_vm_tcp_https_port=$(create_random_tcp_port_num)
-	_vbox_manage 4 modifyvm "$_vm" --natpf${_vm_nnet_adapter} "${vm_pf_rulename},tcp,${_host_ip_address},${_vm_tcp_https_port},${_vm_ip_address},443"
-	_vbox_manage 4 setextradata "$_vm" 'vmmcon-tcp-https-port' ${_vm_tcp_https_port}
+		vm_pf_rulename="VMMCON-HTTPS"
+		_vm_tcp_https_port=$(create_random_tcp_port_num)
+		_vbox_manage 4 modifyvm "$_vm" --natpf${_vm_nnet_adapter} "${vm_pf_rulename},tcp,${_host_ip_address},${_vm_tcp_https_port},${_vm_ip_address},443"
+		_vbox_manage 4 setextradata "$_vm" 'vmmcon-tcp-https-port' ${_vm_tcp_https_port}
 
+	fi
+
+	if [[ $_vm_network_mode == 'bridged' ]]; then
+		_vbox_manage 3 modifyvm "$_vm" --nic${_vm_nnet_adapter}=bridged
+	fi
+
+	
+	
 	# only the sky is the limit
 	# TODO ? is this functional without vbox guest additions.
 	#        Likely not, but some have this preinstalled even on install ISOs
@@ -262,6 +322,254 @@ function vmms::create_vm()
 	# VBoxManage modifyvm "$_vm" --iconfile <filename>: Specifies the absolute path on the host file system for the Oracle VM VirtualBox icon to be displayed in the VM
 	# we have huge icons and some bit smaller in $SCRIPT_DIR/CreateVBoxVMfromISO.d/distro_icons.d/(512|128)
 
+# 	### mimik the behaviour of the GUI as good as we can
+# 	### --port 0 --device 0 = Primary Master
+# 	### --port 0 --device 1 = Primary Slave
+# 	### --port 1 --device 0 = Secondary Master
+# 	### --port 1 --device 1 = Secondary Slave
+# 	_vbox_manage 6 storagectl  "$_vm" \
+# 		--name "IDE" \
+# 		--add ide
+# 	_vbox_manage 12 storageattach  "$_vm" \
+# 		--storagectl "IDE" \
+# 		--port 1 \
+# 		--device 0 \
+# 		--type dvddrive \
+# 		--medium "$filepath"
+
+# 	### add SATA controller, add disk and attach disk to SATA
+# 	# TODO controller types are available
+# 	# shellcheck disable=SC2034
+# 	vm_disk_controller="${vm_disk_controller:="IntelAHCI"}"
+# 	vm_disk_controller_name="${vm_disk_controller_name:="SATA"}"
+# 	_vbox_manage 12 storagectl  "$_vm" \
+# 		--name "$vm_disk_controller_name" \
+# 		--add sata \
+# 		--controller "$vm_disk_controller" \
+# 		--portcount 1 \
+# 		--bootable on
+# 
+# 	# TODO switch disk type to vmdk? the upcoming qemu flavour of this script could use that one out of the box
+# 	declare -l _vm_disk_type="$vm_disk_type"
+# 	declare -u _vm_disk_format="$vm_disk_type" # TODO: correct? see ~20 lines below. seems to be correct
+# 	declare -A _vm_disk_variants
+# 	### translate internal key words to vbox command options
+# 	_vm_disk_variants[dynamic]="Standard"
+# 	_vm_disk_variants[fixed]="Fixed"
+# 	### ensure array keys to be lower cased
+# 	declare -l _vm_disk_alloc="${vm_disk_alloc}" # other way to lower the case: _vm_disk_alloc="${vm_disk_alloc,,}"
+# 	_vm_disk_variant=${_vm_disk_variants[$_vm_disk_alloc]}
+# 	printf "creating $vm_disk_count disk(s) of $vm_disk_size GB type '$vm_disk_type'\n" >&2
+# 	### create hard disk if not disabled (disk count == 0)
+# 	if (( vm_disk_count > 0 )); then
+# 		VM_DISK_DIR="$(dirname "$(_vbox_manage 2 showvminfo "$_vm" 2>/dev/null | sed -n 's/^Config file: *//pi')" | sed -n 's/^.$//i')"
+# 		VM_DISK_DIR="${VM_DISK_DIR:-$VBOX_VM_PATH/$vm_name}"
+# 		# TODO disk creation is a critical process, that might fail! on error user shall be informed!
+# 		# one of the common errors: VBox GUI does bot delete all files, although told so! (if file still
+# 		# exists with the name we create automatically, the createmedium will fail!
+# 		_vbox_manage 10 createmedium "disk" \
+# 			--filename "$VM_DISK_DIR/$vm_name.$_vm_disk_type" \
+# 			--format "$_vm_disk_format" \
+# 			--variant "$_vm_disk_variant" \
+# 			--size $((vm_disk_size*1024))
+# 		_vbox_manage 12 storageattach  "$_vm" \
+# 			--storagectl "$vm_disk_controller_name" \
+# 			--port 0 \
+# 			--device 0 \
+# 			--type hdd \
+# 			--medium "$VM_DISK_DIR/$vm_name.$vm_disk_type"
+# 	fi
+
+	_created=0
+	return $_created
+}
+
+
+
+function vmms::_create_vdi_image_from_raw_image()
+{
+	local _vm="$1"
+	local _fp="$2"
+	declare -l _vm_disk_type="$vm_disk_type"
+	declare -u _vm_disk_format="$vm_disk_type" # TODO: correct? see ~20 lines below. seems to be correct
+	declare -A _vm_disk_variants
+	### translate internal key words to vbox command options
+	_vm_disk_variants[dynamic]="Standard"
+	_vm_disk_variants[fixed]="Fixed"
+	### ensure array keys to be lower cased
+	declare -l _vm_disk_alloc="${vm_disk_alloc}" # other way to lower the case: _vm_disk_alloc="${vm_disk_alloc,,}"
+	VM_DISK_DIR="$(dirname "$(_vbox_manage 2 showvminfo "$_vm" 2>/dev/null | sed -n 's/^Config file: *//pi')" | sed -n 's/^.$//i')"
+	VM_DISK_DIR="${VM_DISK_DIR:-$VBOX_VM_PATH/$_vm}"
+	_vm_disk_variant=${_vm_disk_variants[$_vm_disk_alloc]}
+	_vbox_manage 7 convertfromraw "$_fp" "$VM_DISK_DIR/$_vm.$vm_disk_type" \
+			--format "$_vm_disk_format" \
+			--variant "$_vm_disk_variant"
+}
+
+function vmms::_add_storage_controller_sata()
+{
+	### add SATA controller, add disk and attach disk to SATA
+	# TODO controller types are available
+	vm_disk_controller="${vm_disk_controller:="IntelAHCI"}"
+	vm_disk_controller_name="${vm_disk_controller_name:="SATA"}"
+	_vbox_manage 12 storagectl  "$_vm" \
+		--name "$vm_disk_controller_name" \
+		--add sata \
+		--controller "$vm_disk_controller" \
+		--portcount 1 \
+		--bootable on
+	# TODO error check
+	printf "%s" "$vm_disk_controller_name"
+}
+function vmms::_create_disk()
+{
+	local _vm="$1"
+	# TODO switch disk type to vmdk? the upcoming qemu flavour of this script could use that one out of the box
+	declare -l _vm_disk_type="$vm_disk_type"
+	declare -u _vm_disk_format="$vm_disk_type" # TODO: correct? see ~20 lines below. seems to be correct
+	declare -A _vm_disk_variants
+	### translate internal key words to vbox command options
+	_vm_disk_variants[dynamic]="Standard"
+	_vm_disk_variants[fixed]="Fixed"
+	### ensure array keys to be lower cased
+	declare -l _vm_disk_alloc="${vm_disk_alloc}" # other way to lower the case: _vm_disk_alloc="${vm_disk_alloc,,}"
+	_vm_disk_variant=${_vm_disk_variants[$_vm_disk_alloc]}
+	# TODO disk creation is a critical process, that might fail! on error user shall be informed!
+	# one of the common errors: VBox GUI does bot delete all files, although told so! (if file still
+	# exists with the name we create automatically, the createmedium will fail!
+	VM_DISK_DIR="$(dirname "$(_vbox_manage 2 showvminfo "$_vm" 2>/dev/null | sed -n 's/^Config file: *//pi')" | sed -n 's/^.$//i')"
+	VM_DISK_DIR="${VM_DISK_DIR:-$VBOX_VM_PATH/$_vm}"
+	_vbox_manage 10 createmedium "disk" \
+		--filename "$VM_DISK_DIR/$_vm.$_vm_disk_type" \
+		--format "$_vm_disk_format" \
+		--variant "$_vm_disk_variant" \
+		--size $((vm_disk_size*1024))
+}
+function vmms::_attach_disk()
+{
+	local _vm="$1"
+	local _cn="$2"
+	declare -l _dt="$vm_disk_type"
+	VM_DISK_DIR="$(dirname "$(_vbox_manage 2 showvminfo "$_vm" 2>/dev/null | sed -n 's/^Config file: *//pi')" | sed -n 's/^.$//i')"
+	VM_DISK_DIR="${VM_DISK_DIR:-$VBOX_VM_PATH/$_vm}"
+	_vbox_manage 12 storageattach  "$_vm" \
+		--storagectl "$_cn" \
+		--port 0 \
+		--device 0 \
+		--type hdd \
+		--medium "$VM_DISK_DIR/$_vm.$_dt"
+}
+# TODO: avoid code duplication !!!
+function vmms::_add_image_as_disk()
+{
+	local _vm="$1"
+	local _fp="$2"
+
+# 	### add SATA controller, add disk and attach disk to SATA
+# 	# TODO controller types are available
+# 	# shellcheck disable=SC2034
+# 	vm_disk_controller="${vm_disk_controller:="IntelAHCI"}"
+# 	vm_disk_controller_name="${vm_disk_controller_name:="SATA"}"
+# 	_vbox_manage 12 storagectl  "$_vm" \
+# 		--name "$vm_disk_controller_name" \
+# 		--add sata \
+# 		--controller "$vm_disk_controller" \
+# 		--portcount 1 \
+# 		--bootable on
+	vm_disk_controller_name="$(vmms::_add_storage_controller_sata)"
+
+	# TODO this requires a loop to create multiple disks
+	### create hard disk if not disabled (disk count == 0)
+	if (( vm_disk_count > 0 )); then
+		# TODO switch disk type to vmdk? the upcoming qemu flavour of this script could use that one out of the box
+		declare -l _vm_disk_type="$vm_disk_type"
+		declare -u _vm_disk_format="$vm_disk_type" # TODO: correct? see ~20 lines below. seems to be correct
+		declare -A _vm_disk_variants
+		### translate internal key words to vbox command options
+		_vm_disk_variants[dynamic]="Standard"
+		_vm_disk_variants[fixed]="Fixed"
+		### ensure array keys to be lower cased
+		declare -l _vm_disk_alloc="${vm_disk_alloc}" # other way to lower the case: _vm_disk_alloc="${vm_disk_alloc,,}"
+		_vm_disk_variant=${_vm_disk_variants[$_vm_disk_alloc]}
+		### create hard disk if not disabled (disk count == 0)
+		VM_DISK_DIR="$(dirname "$(_vbox_manage 2 showvminfo "$_vm" 2>/dev/null | sed -n 's/^Config file: *//pi')" | sed -n 's/^.$//i')"
+		VM_DISK_DIR="${VM_DISK_DIR:-$VBOX_VM_PATH/$_vm}"
+		# TODO disk creation is a critical process, that might fail! on error user shall be informed!
+		# one of the common errors: VBox GUI does bot delete all files, although told so! (if file still
+		# exists with the name we create automatically, the createmedium will fail!
+# # 		_vbox_manage 10 createmedium "disk" \
+# # 			--filename "$VM_DISK_DIR/$_vm.$_vm_disk_type" \
+# # 			--format "$_vm_disk_format" \
+# # 			--variant "$_vm_disk_variant" \
+# # 			--size $((vm_disk_size*1024))
+# 		_vbox_manage 12 storageattach  "$_vm" \
+# 			--storagectl "$vm_disk_controller_name" \
+# 			--port 0 \
+# 			--device 0 \
+# 			--type hdd \
+# 			--medium "$VM_DISK_DIR/$_vm.$vm_disk_type"
+		vmms::_attach_disk "$_vm" "$vm_disk_controller_name"
+	fi
+}
+# TODO: avoid code duplication !!!
+function vmms::_add_new_empty_disk()
+{
+	local _vm="$1"
+	
+# 	### add SATA controller, add disk and attach disk to SATA
+# 	# TODO controller types are available
+# 	# shellcheck disable=SC2034
+# 	vm_disk_controller="${vm_disk_controller:="IntelAHCI"}"
+# 	vm_disk_controller_name="${vm_disk_controller_name:="SATA"}"
+# 	_vbox_manage 12 storagectl  "$_vm" \
+# 		--name "$vm_disk_controller_name" \
+# 		--add sata \
+# 		--controller "$vm_disk_controller" \
+# 		--portcount 1 \
+# 		--bootable on
+	vm_disk_controller_name="$(vmms::_add_storage_controller_sata)"
+	
+	# TODO this requires a loop to create multiple disks
+	### create hard disk if not disabled (disk count == 0)
+	if (( vm_disk_count > 0 )); then
+		printf "creating $vm_disk_count disk(s) of $vm_disk_size GB type '$vm_disk_type'\n" >&2
+		
+# 		# TODO switch disk type to vmdk? the upcoming qemu flavour of this script could use that one out of the box
+# 		declare -l _vm_disk_type="$vm_disk_type"
+# 		declare -u _vm_disk_format="$vm_disk_type" # TODO: correct? see ~20 lines below. seems to be correct
+# 		declare -A _vm_disk_variants
+# 		### translate internal key words to vbox command options
+# 		_vm_disk_variants[dynamic]="Standard"
+# 		_vm_disk_variants[fixed]="Fixed"
+# 		### ensure array keys to be lower cased
+# 		declare -l _vm_disk_alloc="${vm_disk_alloc}" # other way to lower the case: _vm_disk_alloc="${vm_disk_alloc,,}"
+# 		_vm_disk_variant=${_vm_disk_variants[$_vm_disk_alloc]}
+# 		# TODO disk creation is a critical process, that might fail! on error user shall be informed!
+# 		# one of the common errors: VBox GUI does bot delete all files, although told so! (if file still
+# 		# exists with the name we create automatically, the createmedium will fail!
+# 		VM_DISK_DIR="$(dirname "$(_vbox_manage 2 showvminfo "$_vm" 2>/dev/null | sed -n 's/^Config file: *//pi')" | sed -n 's/^.$//i')"
+# 		VM_DISK_DIR="${VM_DISK_DIR:-$VBOX_VM_PATH/$_vm}"
+# 		_vbox_manage 10 createmedium "disk" \
+# 			--filename "$VM_DISK_DIR/$_vm.$_vm_disk_type" \
+# 			--format "$_vm_disk_format" \
+# 			--variant "$_vm_disk_variant" \
+# 			--size $((vm_disk_size*1024))
+		vmms::_create_disk "$_vm"
+
+# 		_vbox_manage 12 storageattach  "$_vm" \
+# 			--storagectl "$vm_disk_controller_name" \
+# 			--port 0 \
+# 			--device 0 \
+# 			--type hdd \
+# 			--medium "$VM_DISK_DIR/$_vm.$vm_disk_type"
+		vmms::_attach_disk "$_vm" "$vm_disk_controller_name"
+	fi
+}
+function vmms::_add_ide_and_iso_image()
+{
+	# TODO: separate this into adding controller and adding iso?
+	local _vm="$1"
+	local _fp="$2"
 	### mimik the behaviour of the GUI as good as we can
 	### --port 0 --device 0 = Primary Master
 	### --port 0 --device 1 = Primary Slave
@@ -275,54 +583,36 @@ function vmms::create_vm()
 		--port 1 \
 		--device 0 \
 		--type dvddrive \
-		--medium "$filepath"
+		--medium "$_fp"
+}
+function vmms::create_vm_with_disk_image()
+{
+	local _vm="$1"
 
-	### add SATA controller, add disk and attach disk to SATA
-	# TODO controller types are available
-	# shellcheck disable=SC2034
-	vm_disk_controller="${vm_disk_controller:="IntelAHCI"}"
-	vm_disk_controller_name="${vm_disk_controller_name:="SATA"}"
-	_vbox_manage 12 storagectl  "$_vm" \
-		--name "$vm_disk_controller_name" \
-		--add sata \
-		--controller "$vm_disk_controller" \
-		--portcount 1 \
-		--bootable on
+	_created=1
 
-	# TODO switch disk type to vmdk? the upcoming qemu flavour of this script could use that one out of the box
-	declare -l _vm_disk_type="$vm_disk_type"
-	declare -u _vm_disk_format="$vm_disk_type"
-	declare -A _vm_disk_variants
-	### translate internal key words to vbox command options
-	_vm_disk_variants[dynamic]="Standard"
-	_vm_disk_variants[fixed]="Fixed"
-	### ensure array keys to be lower cased
-	declare -l _vm_disk_alloc="${vm_disk_alloc}" # other way to lower the case: _vm_disk_alloc="${vm_disk_alloc,,}"
-	_vm_disk_variant=${_vm_disk_variants[$_vm_disk_alloc]}
-	printf "creating $vm_disk_count disk(s) of $vm_disk_size GB type '$vm_disk_type'\n" >&2
-	### create hard disk if not disabled (disk count == 0)
-	if (( vm_disk_count > 0 )); then
-		VM_DISK_DIR="$(dirname "$(_vbox_manage 2 showvminfo "$_vm" 2>/dev/null | sed -n 's/^Config file: *//pi')" | sed -n 's/^.$//i')"
-		VM_DISK_DIR="${VM_DISK_DIR:-$VBOX_VM_PATH/$vm_name}"
-		# TODO disk creation is a critical process, that might fail! on error user shall be informed!
-		# one of the common errors: VBox GUI does bot delete all files, although told so! (if file still
-		# exists with the name we create automatically, the createmedium will fail!
-		_vbox_manage 10 createmedium "disk" \
-			--filename "$VM_DISK_DIR/$vm_name.$_vm_disk_type" \
-			--format "$_vm_disk_format" \
-			--variant "$_vm_disk_variant" \
-			--size $((vm_disk_size*1024))
-		_vbox_manage 12 storageattach  "$_vm" \
-			--storagectl "$vm_disk_controller_name" \
-			--port 0 \
-			--device 0 \
-			--type hdd \
-			--medium "$VM_DISK_DIR/$vm_name.$vm_disk_type"
-	fi
-
-	_created=0
+	vmms::_create_vm "$_vm" \
+	&& vmms::_create_vdi_image_from_raw_image "$_vm" "$filepath" \
+	&& vmms::_add_image_as_disk "$_vm" "$filepath" \
+	&& _created=0
+	
 	return $_created
 }
+function vmms::create_vm_from_iso_image()
+{
+	local _vm="$1"
+
+	_created=1
+
+	vmms::_create_vm "$_vm" \
+	&& vmms::_add_ide_and_iso_image "$_vm" "$filepath" \
+	&& vmms::_add_new_empty_disk "$_vm" \
+	&& _created=0
+	
+	return $_created
+}
+
+
 
 function vmms::vm_unattended_install()
 {
@@ -524,13 +814,19 @@ function vmms::list_vms_stopped() # -
 	) \
 	| ( echo; sort ) | uniq --unique
 }
-# TODO: common name scheme? all starting with vm_?
 function vmms::power_off_vm()
 {
 	local _vm="$1"
 # 	local _force="$2"
 	echo "power off..." >&2
-	_vbox_manage N controlvm "$_vm"  acpipowerbutton
+	_vbox_manage 3 controlvm "$_vm" poweroff
+}
+function vmms::acpi_power_off_vm()
+{
+	local _vm="$1"
+# 	local _force="$2"
+	echo "acpi power off..." >&2
+	_vbox_manage 3 controlvm "$_vm" acpipowerbutton
 }
 function vmms::purge_vm_saved_state()
 {

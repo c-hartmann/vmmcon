@@ -13,6 +13,7 @@
 	"example_jq": "jq -r '.systems.neon.vbox.vm_ostype' < automagic.json",
 	"example_py": "python3 -c 'import sys, json; print(json.load(sys.stdin)[\"systems\"][\"neon\"][\"vbox\"][\"vm_ostype\"])' < automagic.json",
 	"example_py_2": "python -m json.tool ...",
+	
 	"helpfull": "jq -s . heart_rate*.json > ../heart_rate.json (merges multiple json files)",
 
 	"filters": {

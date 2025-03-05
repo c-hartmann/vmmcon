@@ -4,12 +4,6 @@
 
 # this script requires minimum version 4 as of Bash on the 20th of February, 2009
 
-### ###########################################################################
-
-### script: vmmcon.sh (Virtual Machine Monitor/Manager (on) Console)
-
-### hypcon ?
-
 ### https://www.ip-insider.de/was-ist-ein-vmm-virtual-machine-monitor-a-3dddd13fb17d2d776529f03465788118/
 ### > Virtual Machine Monitor ist eine alternative Bezeichnung für Hypervisor.
 
@@ -23,12 +17,12 @@
 
 ### author: hartmann.christian@gmail.com, c-hartmann@github.com, github.com/c-hartmann
 ### description: Creates a Virtual Machine from suitable ISO images or controls existing
-### last update: 2023-09-01
+### last update: 2024-09-01
 
 ### preferred places to live in:
 ### $HOME/.local/bin/
 ### $HOME/.local/share/kservices5/ServiceMenus/ (where the service menu wrapper goes)
-### SPDX-FileCopyrightText: 2023 Christian Hartmann <hartmann.christian@gmail.com>
+### SPDX-FileCopyrightText: 2024 Christian Hartmann <hartmann.christian@gmail.com>
 ### SPDX-License-Identifier: LicenseRef-KDE-Accepted-GPL
 
 ### This program is free software; you can redistribute it and/or
@@ -56,10 +50,14 @@ VERSION="0.1.50"
 ### by default this is not verbose
 VERBOSE=false
 
+### deprecated base and fallback for vm name stamp
+TODAY="$(date --iso-8601)"
+
 ### exit immediatly if a command exits with a non-zero status
 ### WARNING: uncommenting won't allow kdialogs getting canceled
 # TODO: capsulate these processes with set +o or unset -o ?
 #set -o errexit
+
 
 ### treat undefined vars as errors and break if found
 set -o nounset
@@ -129,7 +127,7 @@ Options on creation of a new VM:
   -n | --name                   Name the machine to create
   -o | --option                 Set option by it's name as in foo=bar
   -p | --profile <profile>      A profile to use
-  -S | --stamp <stamp>          Append <stamp> instead of TODAY to vm name
+  -S | --stamp <stamp>          Append <stamp> instead of the default to vm name
   -u | --power-up               Power up the VM after creating one
   -y | --yes                    Assume yes to all interactive questions
 
@@ -191,8 +189,8 @@ VMMCON_DESKTOP_DIRECTORY_TEMPLATE="desktop-menu-category.directory"
 ### until you configure it to do so
 ### try creating or editing $HOME/.config/plasma-workspace/env/path.sh
 ### see: https://userbase.kde.org/Session_Environment_Variables
-# VMMCON_PATH_CANONICAL="$(readlink -f "$MY_PATH")"
 # currently hard coded
+# VMMCON_PATH_CANONICAL="$(readlink -f "$MY_PATH")" # or just readlink -f $0 ?
 # shellcheck disable=SC2034 # used in template
 VMMCON_PATH_CANONICAL="$HOME/.local/bin/vmmcon" # might be a link to vmmcon.sh
 
@@ -203,7 +201,7 @@ ME="${MY_NEW_NAME}"
 
 # default title (for dialogs and such)
 # MY_TITLE="Virtual Machine Monitor Console" # VM Monitor is a nick for Hypervisor
-MY_TITLE="Hypervisor Console" # VM Monitor is a nick for Hypervisor
+MY_TITLE="VMMCON" # VM Monitor is a nick for Hypervisor
 
 # depending in my command name / binary create might be a default
 if [[ "${MY_FILE}" =~ ^create-.* ]]; then
@@ -276,9 +274,7 @@ fi
 terminal=false
 
 ### set some defaults so we do not fail on using these later
-# TODO: does this interfere with vmmconrc !? > no. see line ~420
-TODAY="$(date --iso-8601)"
-STAMP=''
+STAMP="-$(date --iso-8601)"
 
 ### every new VM name will be trailed by a STAMP based on current date
 create_stamp=$(true)
@@ -429,9 +425,9 @@ vm_hid_keyboard="ps2"
 # shellcheck disable=SC2034 # used in functions
 vm_usb="on"      # USB-1.1, default: "off"
 # shellcheck disable=SC2034 # used in functions
-vm_usbehci="off" # USB-2.0, default: "off" # incompatible vbox ext pack can prevent system
+vm_usb_ehci="off" # USB-2.0, default: "off" # incompatible vbox ext pack can prevent system
 # shellcheck disable=SC2034 # used in functions
-vm_usbxhci="off" # USB-3.0, default: "off" # from booting if usb 2 or 3 support is enabled
+vm_usb_xhci="off" # USB-3.0, default: "off" # from booting if usb 2 or 3 support is enabled
 
 ### audio
 # shellcheck disable=SC2034 # used in functions
@@ -442,6 +438,10 @@ vm_audioin="off"
 vm_audiocontroller="ac97"
 # shellcheck disable=SC2034 # used in functions
 vm_audiocodec="ad1980" # default in gui mode
+
+### network
+vm_network_mode="nat" # or "bridged", "hostonly", "...",
+
 
 ### vbox allows custom graphics resolutions
 # shellcheck disable=SC2034 # used in functions
@@ -534,7 +534,7 @@ function _error_exit()
 {
 	local error_str
 	error_str="$(gettext "ERROR")"
-	$gui && kdialog --error "$error_str: $*" --ok-label 'So Sad'
+	$gui && kdialog --title "${MY_TITLE}" --error "$error_str: $*" --ok-label 'So Sad'
 	$cli && printf "\n%s: %s\n\n" "$error_str" "$1" >&2
 	# shellcheck disable=SC2086 # shall be an integer - no sring quoting
 	exit ${2:-1}
@@ -544,7 +544,7 @@ function _error_exit()
 ### even more simple error handling
 function _plain_exit()
 {
-	$gui && kdialog --msgbox "$*" --ok-label 'OK'
+	$gui && kdialog --title "${MY_TITLE}" --msgbox "$*" --ok-label 'OK'
 	$cli && printf "\n%s: %s\n\n" "$1" >&2
 	# shellcheck disable=SC2086 # shall be an integer - no sring quoting
 	exit ${2:-1}
@@ -561,7 +561,7 @@ function _canceled_exit()
 function _warning()
 {
 	if $gui; then
-		kdialog --warningcontinuecancel "WARNING: $*"
+		kdialog --title "${MY_TITLE}" --warningcontinuecancel "WARNING: $*"
 		return $?
 	else
 		printf "\n" >&2
@@ -601,15 +601,15 @@ function _user_file_path()
 	local _fn
 	local _secs=10
 	if $gui; then
-		_fp=$(kdialog --getopenfilename "$_dir" "application/x-cd-image" 2>/dev/null)
+		_fp=$(kdialog --title "${MY_TITLE}" --getopenfilename "$_dir" "application/x-cd-image application/vnd.efi.iso application/vnd.efi.img" 2>/dev/null)
 		printf '%s' "$_fp"
 	else
 		# TODO replace 'which' by either 'type' or 'command'
 		if which mimetype >/dev/null ; then
-			printf 'looking for ISO images by mime type (application/x-cd-image). this will take some time …\n' >&2
+			printf 'looking for ISO images by mime type. this will take some time …\n' >&2
 			printf '\n' >&2
 			# shellcheck disable=SC2156
-			( cd "$_dir" || _error_exit "can not change to directory"; find . -type f -exec bash -c "mimetype \"{}\" | grep -q application/x-cd-image" \; -print | sed 's#^./##' | sort >&2 )
+			( cd "$_dir" || _error_exit "can not change to directory"; find . -type f -exec bash -c "mimetype \"{}\" | grep -qe application/x-cd-image|application/vnd.efi.iso|application/vnd.efi.img" \; -print | sed 's#^./##' | sort >&2 )
 		else
 			( cd "$_dir" || _error_exit "can not change to directory"; find . -- *.iso *.ISO | grep -e '.iso$' | sed 's#^./##' | sort >&2 )
 		fi
@@ -696,15 +696,13 @@ function _user_profile()
 	local i
 	i=1 ### NOTE the helper array will start with index 1
 # 	for conf in "${PROFILES_DIR_LOCAL}"/*.conf "${PROFILES_DIR}"/*.conf; do
-	for conf in "${PROFILES_DIR}"/?*.conf; do
+	for profile_conf in "${PROFILES_DIR}"/?*.conf; do
 		name="UNKNOWN"
-# 		. "$profile_conf"
 		# get simple tag from path to config file
-		tag="${conf%.conf}"
+		tag="${profile_conf%.conf}"
 		tag="${tag##*/}"
 # 		tag="${tag#*_}" # remove leading 'NN_'   # TODO there should a better solution .. e.g. profile=linux internally or tag=
 		### add to Array if not already in (e.g. from local file)
-# 		set +o nounset
 # 		if [[ ! -v profile_select_list[$tag] ]]; then
 		if ! _is_in_profile_select_list "$tag"; then
 # 			profile_select_list[$i]="$tag" # TODO: $name ?
@@ -714,7 +712,6 @@ function _user_profile()
 			profile_select_list_helper[$i]="$tag"
 			((i++))
 		fi
-# 		set -o nounset
 # 		profile_select_list[$i]="$tag"
 # 		profile_select_list_helper[$i]="$tag"
 #  		((i++))
@@ -728,7 +725,7 @@ function _user_profile()
 			kdialog_radiolist_tag_item_list+="${profile_select_list[$i]} ${profile_select_list[$i]} off "
 		done
 		# shellcheck disable=SC2086 # the list shall be individual items - not just one option
-		REPLY="$(kdialog --title "$MY_TITLE" --radiolist "Select profile to use:" $kdialog_radiolist_tag_item_list)"
+		REPLY="$(kdialog --title "${MY_TITLE}" --radiolist "Select profile to use:" $kdialog_radiolist_tag_item_list)"
 		### handle AUTO…
 # 		if [[ $REPLY =~ auto ]]; then
 # 			_verbose "choosing profile auto magically …" >&2
@@ -846,6 +843,31 @@ function _ask_vm_name()
 		printf '\n' >&2
 	fi
 	printf '%s' "${_vm_name}"
+}
+
+### _create_and_ask_vm_name - wrapper that asks userin to create vm and for vm's name
+function _create_and_ask_vm_name()
+{
+	local __iso_image_filename="$1"
+	local __vm_name_suggest="$2"
+	local _vm_name
+	local _spacer="                                          " # create a wider dialog
+	if $gui; then
+		# no other than default label allowed here (--ok-label "Create")
+		_vm_name=$(kdialog --title "${MY_TITLE}" --icon=question --inputbox "Create virtual machine with this name from '${__iso_image_filename}'?" "$__vm_name_suggest")
+	else
+		printf "\n" >&2
+		printf "Create virtual machine with this name from '${__iso_image_filename}'?\n" >&2
+		read -r -t 10 -p "» " -e -i "$__vm_name_suggest"
+		REPLY="$(_strip "$REPLY")"
+		if [[ -z "${REPLY}" ]]; then
+			_vm_name="$__vm_name_suggest"
+		else
+			_vm_name="${REPLY}"
+		fi
+		printf "\n" >&2
+	fi
+	printf "%s" "${_vm_name}"
 }
 
 ### _ask_yes_no - wrapper that respects gui or cli mode
@@ -1043,7 +1065,7 @@ function _create_desktop_entry() # $VM
 
 # --------------------------------------
 # delete a formerly created entry in desktop start menu
-function _delete_desktop_entry() # $VM
+function _delete_desktop_entry()
 {
 	local _vm="$1"
 	local -l _my_vendor_prefix="org.${MY_NEW_NAME}"
@@ -1072,7 +1094,7 @@ function _delete_desktop_entry() # $VM
 
 # --------------------------------------
 # delete a formerly created entry in desktop start menu
-function _search_desktop_entry() # $VM
+function _search_desktop_entry()
 {
 	local _vm="$1"
 	local -l _my_vendor_prefix="org.${MY_NEW_NAME}"
@@ -1080,6 +1102,18 @@ function _search_desktop_entry() # $VM
 # 	_application_desktop_filename="${_my_vendor_prefix}.vm.$(_get_simple_name "$_vm").desktop"
 	find "${_application_desktop_dir}" -name "${_my_vendor_prefix}.vm.*${_vm}*.desktop"
 }
+
+# --------------------------------------
+# check if an iso image file is bootable
+function _is_bootable_iso_image()
+{
+	local _iso="$1"
+	file "$_iso" | grep -q -e '(bootable)$'
+}
+# ----- somethin similar possible to check if an iso requires EFI to boot?
+# playtron alpha is an example
+
+
 
 ### commands instead of options.. (if after reading options first word is one of these)
 #_default_command=create
@@ -1165,7 +1199,7 @@ function _run_command()
 		_argv+=("$1")
 		shift
 	done
-	_command=${_argv[0]}
+	_command="${_argv[0]}"
 	# TODO: experimental idea to handle aliases, such as new | launch | up for 'create'
 	declare -A command_aliases
 	command_aliases[launch]='create'
@@ -1218,14 +1252,12 @@ function _run_command()
 			echo ${valid_commands[@]}
 			_return=0
 		;;
-# 		create | new | launch | up )
 		create ) # hopefully now handled via new aliases construct
 			_created=1
 			### if filepath not set via option -f, use first argument instead
 			if [[ -z "$filepath" ]]; then
-				# TODO next test does not work as expectet :(
-				if [[ -n "${_argv[1]}" ]]; then
 				[[ -z "${_argv[1]+x}" ]] && _error_exit "This command requires an argument or a filepath giving ($LINENO)"
+				if [[ -n "${_argv[1]}" ]]; then
 					filepath="${_argv[1]}"
 					_verbose "filepath=$filepath (by \$1)"
 					shift 1
@@ -1259,27 +1291,29 @@ function _run_command()
 			if [[ -n "$xdg_mime" ]]; then
 				printf '%s\n' "checking mime type …" >&2
 				mime_type="$($xdg_mime query filetype "$filepath" 2>/dev/null)"
-				[[ "$mime_type" =~ application/x-cd-image ]] || _error_exit "Specified ISO file does not fulfil mime type requirement: 'application/x-cd-image'. Giving up ($LINENO)"
+				[[ "$mime_type" =~ application/x-cd-image ]] || [[ "$mime_type" =~ application/vnd.efi.iso ]] || [[ "$mime_type" =~ application/vnd.efi.img ]] || _error_exit "Specified image file does not fulfill one of these mime type requirements: 'application/x-cd-image, application/vnd.efi.iso, application/vnd.efi.img'. Giving up ($LINENO)"
 			fi
 			### check if we have a valid ISO file and fail if not
+			#
 			# TODO replace 'which' by either 'type' or 'command'
+			#
 			isovfy="$(which isovfy)" # TODO: use file -p instead?
 			if [[ -n "$isovfy" ]]; then
-				printf '%s\n' "Veryfying iso image …" >&2
-				$isovfy "$filepath" >/dev/null 2>&1 || _error_exit "Specified ISO file could not be veryfied as a valid ISO image. Giving up ($LINENO)"
+				printf '%s\n' "Veryfying image file …" >&2
+				$isovfy "$filepath" >/dev/null 2>&1 || _error_exit "Specified file could not be veryfied as a valid image. Giving up ($LINENO)" # note: verifies IMG files as well
 			fi
 			### use filename as in filepath to search for a profile
 			filename="${filepath##*/}"
 			_verbose filename="$filename"
 			### inform the user*in"
 # 			if [[ $yes = true ]]; then
-			if $yes ; then
-				:
-			else
-				if ! _ask_yes_no "Create virtual machine from \"$filename\"?" "Create" "Cancel"; then
-					_canceled_exit
-				fi
-			fi
+# 			if $yes ; then
+# 				:
+# 			else
+# 				if ! _ask_yes_no "Create virtual machine from \"$filename\"?" "Create" "Cancel"; then
+# 					_canceled_exit
+# 				fi
+# 			fi
 			### create a simple suggestion for the vm name from ISO image file name
 			_vm_name_suggest="${filename%.*}"
 			_vm_name_suggest="${vm_name:-$_vm_name_suggest}"
@@ -1288,7 +1322,7 @@ function _run_command()
 				if [[ -n "${STAMP}" ]]; then
 					_vm_name_suggest="${_vm_name_suggest}${STAMP}"
 				else
-					_vm_name_suggest="${_vm_name_suggest} (${TODAY})"
+					_vm_name_suggest="${_vm_name_suggest}-${TODAY}"
 				fi
 			fi
 			### get a name for the new virtual machine
@@ -1298,7 +1332,8 @@ function _run_command()
 				# unfortunately kdialog --imginputbox does not respect additional preset text as --inputbox does,
 				# so we can not use a nice icon here: "$BIN_DIR/${MY_NAME}.d/icons.d/display-and-tower.svg"
 				# extra spaces trainling the proposed text are required as kdialog does not respect the text length
-				vm_name=$(_ask_vm_name "$_vm_name_suggest")
+# 				vm_name=$(_ask_vm_name "$_vm_name_suggest")
+				vm_name=$(_create_and_ask_vm_name "$filename" "$_vm_name_suggest")
 				if [[ -z "$vm_name" ]]; then
 					_canceled_exit
 				fi
@@ -1398,7 +1433,25 @@ function _run_command()
 			done
 			### let the show begin…
 			_notify "Creating new VM" "\"$vm_name\" …"
-			vmms::create_vm "$vm_name" && _created=0
+			
+			
+			# TODO: switch by mimetype of file
+			case $mime_type in
+				application/x-cd-image | application/vnd.efi.iso )
+					printf "creating vm with bootable iso image...\n"
+					vmms::create_vm_from_iso_image "$vm_name" && _created=0
+				;;
+				application/vnd.efi.img )
+					printf "creating vm with disk from raw image...\n"
+					vmms::create_vm_with_disk_image "$vm_name" && _created=0
+				;;
+				* )
+				  _error_exit "Unknown or unsupported mime type ($LINENO): $mime_type"
+				  _return=1
+				;;
+			esac
+			
+			
 			### create desktop entry for starts from start menu
 			if (( _created == 0 )); then
 				if $create_desktop_menu_entry; then
@@ -1583,10 +1636,14 @@ function _run_command()
 			_return=$_grouped
 		;;
 		# stop system by trying to send ACPI stop command
-		# TODO: how does this differ from stop? soft v. hard poweroff?
-		#       is halt equal to ssh/exec halt
 		halt | poweroff | shutdown )
-			_error_exit "Command not yet implemented ($LINENO): '$_command'. Realy sorry"
+			_off=1
+			_vm="${_argv[1]}"
+			vmms::vm_exists "${_argv[1]}" || _error_exit "This VM does not exist: ${_argv[1]} ($LINENO)" # --quiet?
+			vmms::vm_is_stopped "${_argv[1]}" || _error_exit "Can not power off a stopped VM: ${_argv[1]} ($LINENO)" # --quiet?
+			vmms::acpi_power_off_vm "${_vm}" && _off=0 
+			_exit=$_off
+			_return=$_off
 		;;
 		help )
 			_usage
@@ -1620,6 +1677,9 @@ function _run_command()
 					_canceled_exit
 				fi
 			fi
+			#
+			# TODO: clean up this mess.  same code is found ~ line 1319
+			#
 			### create a simple suggestion for the vm name from ISO image file name
 			_vm_name_suggest="${filename%.*}"
 			_vm_name_suggest="${vm_name:-$_vm_name_suggest}"
@@ -1628,7 +1688,7 @@ function _run_command()
 				if [[ -n "${STAMP}" ]]; then
 					_vm_name_suggest="${_vm_name_suggest}${STAMP}"
 				else
-					_vm_name_suggest="${_vm_name_suggest} (${TODAY})"
+					_vm_name_suggest="${_vm_name_suggest}-${TODAY}"
 				fi
 			fi
 			_verbose "_vm_name_suggest=$_vm_name_suggest" >&2
@@ -1705,17 +1765,34 @@ function _run_command()
 			#      we might enable the rule on the fly with controlvm
 			_vm=$(vmms::query_vm "${_argv[1]}" | head -1)
 			_vm_host_ssh_port=$(vmms::get_ssh_port "${_vm}")
-			_vm_tcp_ssh_username="$(vmms::get_ssh_username)"
-			if [[ -n "${_vm_host_ssh_port}" ]]; then
-				printf '%s\n' "running: ssh -p ${_vm_host_ssh_port} ${_vm_tcp_ssh_username}@localhost"
-				printf '%s\n' "if you want to avoid any password request when login, try this command:"
-				printf '%s\n' "$ ssh-copy-id -p 36719 christian@localhost"
-				ssh -p "${_vm_host_ssh_port}" "${_vm_tcp_ssh_username}@localhost"
-				_return=$?
-			else
-				_error_exit "VM ssh port is not set, must quit ($LINENO)"
-				_return=9
-			fi
+			_vm_tcp_ssh_username="$(vmms::get_ssh_username "${_vm}")"
+			typeset -u _vm_net_mode="$(vmms::get_vm_network_mode "${_vm}")"
+			case "${_vm_net_mode}" in
+				'NAT' )
+					if [[ -n "${_vm_host_ssh_port}" ]]; then
+						printf '%s\n' "running: ssh -p ${_vm_host_ssh_port} ${_vm_tcp_ssh_username}@localhost"
+						printf '%s\n' "if you want to avoid any password request when login, try this command:"
+						printf '%s\n' "$ ssh-copy-id -p 36719 christian@localhost"
+						ssh -p "${_vm_host_ssh_port}" "${_vm_tcp_ssh_username}@localhost"
+						_return=$?
+					else
+						_error_exit "VM ssh port is not set, must quit ($LINENO)"
+						_return=9
+					fi
+				;;
+				'BRIDGED' )
+					_vm_ip="$(vmms::get_vm_bridged_ip_addr "${_vm}")"
+						printf '%s\n' "running: ssh ${_vm_tcp_ssh_username}@${_vm_ip}"
+						printf '%s\n' "if you want to avoid any password request when login, try this command:"
+						printf '%s\n' "$ ssh-copy-id christian@${_vm_ip}"
+					ssh "${_vm_tcp_ssh_username}@${_vm_ip}"
+					_return=$?
+				;;
+				* )
+					_error_exit "unknown networking mode ($LINENO): '$_vm_net_mode'. Must quit"
+					_return=9
+				;;
+			esac
 		;;
 		move ) # TODO move into a group or from a group
 			_error_exit "Command not yet implemented ($LINENO): '$_command'. Realy sorry"
@@ -2132,7 +2209,7 @@ while [[ $# -gt 0 ]]; do
 		-i | --iso | --isofile | --isoimage | -f | --file | --from )
 			_verbose "f=${OPTARG}" >&2
 			filepath="${OPTARG}"
-			_verbose "\$filepath=$filepath [by -f]"
+			_verbose "\$filepath=$filepath [by option]"
 			shift 2
 		;;
 		--http )
