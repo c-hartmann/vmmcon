@@ -4,6 +4,12 @@
 ### new path: ~/.config/vmmcon/vmmcon.rc
 ###
 
+# vi modelines...
+# vim: noai:ts=4:sw=4
+# TODO: get ba(sh) syntax without shebang start
+# vim: filetype=sh:
+
+
 
 # TODO:
 # this file might get splitted into a all VM part and individual parts for each VMM provider...
@@ -300,3 +306,7 @@ vm_hid_keyboard="ps2"
 vm_network_mode="nat" # or "bridged", "hostonly", "...",
 
 vm_disk_size_dynamic=true  # preallocating might improve performance on installtion and beyond. use vm_disk_size_dynamic=false to enable preallocation
+
+
+if_default=GUI
+if_terminal_default=TUI # CLI

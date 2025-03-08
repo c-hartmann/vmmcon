@@ -2,6 +2,194 @@
 # TODO hypercon (fka as vmmcon, aka hopper, fka vmctl)
 #
 
+
+Alle Spellchecks am Anfang? siehe: https://github.com/aristocratos/bashtop/blob/master/bashtop
+
+Learn from: https://github.com/aristocratos/bashtop/blob/master/bashtop
+
+
+Can we do Progress dialogs from VBoxManage Output?
+
+
+
+Support GTK/Gnome based Desktop with Zenity
+https://help.gnome.org/users/zenity/stable/
+https://developer.gnome.org/hig/patterns/feedback/dialogs.html
+
+Using Whiptail? (braucht noch ein Pendant zu https://de.wikipedia.org/wiki/Zenity)
+https://derlinuxwikinger.de/grafische-terminal-menues-mit-whiptail/
+https://en.wikibooks.org/wiki/Bash_Shell_Scripting/Whiptail
+https://www.redhat.com/en/blog/use-whiptail
+> Whiptail is included as part of the larger newt library, 
+  which adds functionality to TUI windows.
+https://www.linuxfordevices.com/tutorials/shell-script/interactive-shell-scripts-whiptail
+https://www.youtube.com/watch?v=KsiPYMKSHU8
+> https://gitlab.com/dtos/dtos/-/blob/master/whiptail-example.sh
+https://helloacm.com/creating-ui-controls-under-linux-shell-console-using-whiptail-utility/
+https://gijs-de-jong.nl/posts/pretty-dialog-boxes-for-your-shell-scripts-using-whiptail/
+https://linuxconfig.org/how-to-integrate-dialog-boxes-in-shell-scripts-with-whiptail
+> to get user input redirect stderr to stdout:
+$ username="$(whiptail --inputbox "What is your username?" 10 30 "root" 3>&1 1>&2 2>&3)"
+https://www.youtube.com/watch?v=FJ7KJXmZRXA
+
+Oder dialog? (basiert auf ncurses statt newt)
+https://invisible-island.net/dialog/dialog.html
+
+Und dann ist da noch gdialog
+
+
+SSH login sollte auch für "bridged" VMs klappen:
+# get MAC address:
+$ typeset -l arp="$(VBoxManage showvminfo debian-12.9.0-amd64-netinst-2025-03-05 \
+  | grep -oe 'MAC: [^,]*,' \
+  | awk '{print $2}' \
+  | grep -oe '[0-9A-F]*' \
+  | sed 's/\(..\)/\0\:/g' \
+  | sed -e 's/:$//')"
+# get IP Addr by MAC Addr
+$ arp -a | grep "$arp"
+> data.fritz.box (192.168.178.106) auf 08:00:27:82:ae:4b [ether] auf enp0s25
+$ ip="$(arp -a | grep $arp | grep -o '(.*)' | sed 's/[()]//g')"
+new: function vmms::get_vm_network_mode()
+new: function vmms::get_vm_bridged_ip_addr()
+> DONE!
+
+Globale und Kommando spez. Optionen? wie z.B. in bup(1):
+bup [global options...]  <command> [options...]
+
+https://www.nakivo.com/blog/top-10-proxmox-cli-commands/
+
+Kann ich headless?  (für meinen PBS Test würde das schon Sinn ergeben)
+
+Beim Ausführen der rc Konfiguration könnte sed(1) Fehler wie Leerzeichen
+mit einem einfachen regulären Ausdruck korrgieren.
+
+Vagrantfiles als Vorbild. Die sehen beinahe aus wie JSON. Namen!
+
+Option '--log': show a log file, if there is one
+
+SHASUM: wenn vorhanden, sollen die Quellen für die sha256sum in JSON hinterlegt
+sein und die Integretät der ISOS über eine Option --check-iso / --check-sha 
+geprüft werden (können)
+
+Short:
+VMMCON matches downloaded ISO image file names to configuration template(s) 
+and creates new VMs as quick as possible based on the matches template(s).
+
+hyp(r)con(sole) würde in Listen wie https://linux-kvm.org/page/Management_Tools
+relativ weit oben stehen :)
+
+einzelne VMs mit VirtualBoxVM starten?
+
+Ein install.sh Skript, dass man via Curl aufrufen kann und das den ganzen
+Kladereratsch von GitHub zieht und Dinge wie lokale Pfade kontrolliert
+
+Support "installation" from raw image files (but convert these first), as seen in:
+Ubuntu Core Desktop (Based Entirely On Snaps) - YouTube (Installing from IMG file).png
+https://cdimage.ubuntu.com/ubuntu-core/24/stable/current/
+$ mimetype --all --brief ubuntu-core-24-amd64.img
+application/vnd.efi.img
+application/octet-stream
+$ xdg-mime query filetype ubuntu-core-24-amd64.img
+application/vnd.efi.img
+
+86Box (https://86box.net/)
+https://www.reddit.com/r/86box/comments/1146z2e/loading_configuration_from_command_prompt/
+https://github.com/DDXofficial/sl86/blob/main/launcher.py
+https://rubenerd.com/a-simple-86box-shell-script-launcher/
+https://www.chrisrcook.com/2022/11/15/86box-config-for-redhat-4-x-circa-1997/
+
+Eindeutige Kurzformen von Kommandos sollten möglich sein. Z.B. sollte 'stat'
+anstatt von 'status' möglich sein. Natürlich nur, solange es eindeutig ist.
+
+Gnome Boxes kennt einen Weg, Dateien an die VM zu senden - keine Ahnung, wie
+es das hinbekommt, aber ist schon nützlich. Die landen in ~/Downloads. Bei
+aktivem SSH Damoen könnte man das sicher realisieren. Ist wohl über ein
+spezielles Paket im Client gelöst und nutzt WebDAV oder das Spice Protokoll.
+https://itsfoss.com/share-files-gnome-boxes/
+
+Welches Kommando in den Exec Tei der Applications eingetragen wird, könnte
+man auch noch konfigurieren - insbesondere, wenn das Kommando nicht über den
+Pfad zu finden ist.
+
+Insbesondere wenn eine VM über einen Launcher (wie eine App) gestartet wird,
+sollte keine fatale aber auch nix sagende Fehlermeldung kommen, sondern statt
+dessen eine aussagekräftige Fehlermeldung:  no such VM avalaible, sorry.
+
+Shall create command just create (and *not* run a new VM), whereas launch does
+create *and * run the new VM ?!
+
+_error_exit shall wait on user confirmation if we run in a extra Terminal
+
+Create Serial Ports and try to connect to from terminal.
+Enable Serial Port as TCP, enter port num: 1234
+auf dem gast OS: sudo systemctl start serial-getty@ttyS0 # oder via GRUB?
+                 ip add
+auf dem host OS: telnet <theip>  1234
+
+(/etc/default/grub)
+GRUB_TERMINAL="console serial"
+GRUB_SERIAL_COMMAND="serial --unit=0 --speed=115200"
+
+also here:
+https://wiki.archlinux.org/title/Working_with_the_serial_console
+
+https://www.hagel-it.de/it-insights/virtual-machine-vm-eine-detaillierte-einfuehrung-fuer-technikinteressierte-it-entscheider.html
+Der Virtual Machine Manager (VMM) ist eine Software, die für die Verwaltung und Überwachung von VMs verantwortlich ist. Der VMM ermöglicht die Erstellung, Konfiguration und Verwaltung von VMs.
+Der Virtual Machine Monitor (VMM) ist ein Teil des Hypervisors und überwacht die Ausführung von VMs. Der VMM ist für die Virtualisierung der Hardware verantwortlich und stellt sicher, dass die VMs isoliert und sicher ausgeführt werden.
+>
+vmmcon ist mehr Manager als Monitor! 
+
+Zwischen echten CPU Kernen und virtuellen Kernen unterscheiden? cpu_core_count
+v. vcpu_core_count. https://www.ionos.de/digitalguide/server/knowhow/vcpu/
+> "Krallt" sich eine VM die Anzahl Kerne, die man ihr zugewiesen hat?
+https://www.dev-insider.de/die-optimale-vbox-performance-a-600108025bd5d60928bce795fbd8bb3f/
+> Kann VBox oder VMware mehr vCPUs zuteilen als physisch vorhanden sind?
+
+Implement an _is_bootable_iso_image() function and check image before using it.
+https://superuser.com/questions/440035/how-can-i-check-whether-an-iso-image-is-bootable
+> DONE, but not used yet
+
+readonly KIO_DIR="$HOME/.local/share/kio/servicemenus"
+readonly SERVICEMENUS_DIR="$KIO_DIR/resolvetools-servicemenus"
+from: https://github.com/gabrielcapilla/resolve-tools/blob/main/tools/setup
+> was das !? readonly ?
+
+Die JSON Konfiguration soll frei definiierbare setting groups enthalten.
+Also nicht nur server oder desktop oder minimal oder recommended (aka default), 
+sondern eben auch user definierte Keys ermöglichen. Das kann man evtl. über 
+Dateinamen realisieren ... 
+also neben einem Default wie "pop-os.desktop.json" auch ein
+user definiertes "ubuntu.proxmox.json" oder "debian.kvm.json" oder "fedora.foobar.json"
+Evtl ist "Profil" dafür der richtige Name.
+
+Port Forwarding(80 auf 8084) wäre auch ne feine Sache.
+
+Der Begriff "provider" in Vagrant ist gut! und dann gibt es auch noch
+'provisioner": das sind z.B. Ansible, Puppet oder Chef. Denen dürfte
+gemeinsam sein, dass die einen laufenden ssh Service benötigen. DAVON
+kann man im ISO image basierten Ansatz von vmmcon sicher nicht
+ausgehen.
+
+Zugriff auf Config Values aus dem JSON file in der Art, wie Vagrnt sie
+definiert (config.vm.network) wäre nett, ist aber mit der Syntax in bash
+nicht zu machen. config_vm_network hingegen wäre machbar. Andererseits
+dürfen dann die eigentlichen Werte keine Unterstriche haben, wie z.B. in:
+config.vm.usable_port_range = (2200..2250)
+? können Bash Arrays "verschachtelt" sein? also wie in:
+$config[vm][usable_port_range]='2200..2250'
+> https://www.baeldung.com/linux/bash-2d-arrays
+  zumindest etwas ähnliches, aber fehleranfälliges
+? können array indizes punkte enthalten? also z,b.: $config[vm.usable_port_range]
+> leider nein
+> _ und - hingegen sind zulässig
+
+Vagrant bzw. das Vagranfile können ein Beispiel für die Config in JSON sein.
+Die Syntax greift beschreibt direkt die Kommandozeile bzw. Kommandos mit Optionen:
+vb.customize [ "modifyvm", :id, "--hwvirtex", "off" ]
+vb.customize [ "modifyvm", :id, "--cpus", 2 ]
+vb.customize [ "modifyvm", :id, "--memory", 2048 ]
+
 list command might prefix all VM by VMM. (sample: VBox: debian-12.3-2014-07-20)
 
 @naming:  HOPPER = VMMCON + desktop integration :)
@@ -47,8 +235,10 @@ der Programme)
 gui, cli -> tui ! (with dialog(1))
 > eine oder mehrere abstrahierende dialog Funtionen
 
-hopper als Name könnte sich auf den Maler Edward Hopper beziehen. Macht es aber
-schwieriger danach zu suchen.
+hopper als Name könnte sich auf den Maler Edward Hopper beziehen. 
+Macht es aber ein wenig schwieriger danach zu suchen. Aber zusammen
+mit 'Linux' oder Distro sollte das kein Problem sein. Hugo macht es
+ja nicht anders :)
 
 virsh kennt einen interaktiven Modus ... mmm, sollte hypercon das auch haben?
 mit Blick auf das Erzeugen einer neuen VM liegt das nicht sehr fern.
